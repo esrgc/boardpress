@@ -1,8 +1,29 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+.dashboard {
+  padding: 30px 30px;
+  text-align: center;
 }
 
-a {
-  color: #00B7FF;
+.header {
+  min-height: 120px;
+  width: 100%;
+  background: #589CDB url(../img/top.jpg) left bottom repeat-x;
+  color: #fff;
+  border-bottom: 5px solid #424242;
+}
+
+.header .logo {
+  padding: 10px 30px;
+}
+
+.dashboard .chart {
+  height: 300px;
+  background: #DAEAF8;
+  margin-bottom: 30px;
+  border: 0px solid #DAEAF8;
+  border-radius: 2px;
+}
+
+.dashboard .chart.map {
+  height: 630px;
+  background: #fdede7;
 }

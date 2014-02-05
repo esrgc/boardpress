@@ -1,6 +1,6 @@
 
 /**
- * Module dependencies.
+ *   Shore Transit Dashboard
  */
 
 var express = require('express')
