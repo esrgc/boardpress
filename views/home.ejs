@@ -1,36 +1,31 @@
 <%- include header.ejs %>
-<div class="containaer">
-  <div class="dashboard">
-    <div class="row">
-      <div class="col-md-3">
-        <div class="row">
-          <div class="col-md-12 block1"></div>
-        </div>
-        <div class="row">
-          <div class="col-md-12 block2"></div>
-        </div>
+
+<div class="dashboard">
+  <div class="row">
+    <div class="col-md-3">
+      <div class="row">
+        <div class="col-md-12 block1"></div>
       </div>
-      <div class="col-md-6 block8"></div>
-      <div class="col-md-3">
-        <div class="row">
-          <div class="col-md-12 block3"></div>
-        </div>
-        <div class="row">
-          <div class="col-md-12 block4"></div>
-        </div>
+      <div class="row">
+        <div class="col-md-12 block2"></div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-md-4 block5"></div>
-      <div class="col-md-4 block6"></div>
-      <div class="col-md-4 block7"></div>
+    <div class="col-md-6 block8"></div>
+    <div class="col-md-3">
+      <div class="row">
+        <div class="col-md-12 block3"></div>
+      </div>
+      <div class="row">
+        <div class="col-md-12 block4"></div>
+      </div>
     </div>
   </div>
-</div><!-- /.container -->
-<script type="text/template" id="chart-template">
-  <div class="chart"></div>
-</script>
-<script type="text/template" id="map-template">
-  <div class="chart map"></div>
-</script>
+  <div class="row">
+    <div class="col-md-4 block5"></div>
+    <div class="col-md-4 block6"></div>
+    <div class="col-md-4 block7"></div>
+  </div>
+</div><!-- /.dashboard -->
+
+<%- include templates.html %>
 <%- include footer.ejs %>
