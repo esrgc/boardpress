@@ -1,8 +1,5 @@
 $(document).ready(function(){
-  _.templateSettings = {
-      interpolate : /\{\{(.+?)\}\}/g
-  }
-
+  
   var MapView = Backbone.View.extend({
     mapTemplate: $('#map-template').html(),
     initialize: function() {
@@ -34,7 +31,6 @@ $(document).ready(function(){
     },
     render: function() {
       this.$el.html(Mustache.render(this.chartTemplate, this.model.toJSON()))
-      //this.$el.html(this.chartTemplate())
       return this;
     }
   })
@@ -43,100 +39,28 @@ $(document).ready(function(){
     defaults: function() {
       return {
         api: '/getRoutes',
-        title: 'Chart Title',
-        data: [
-          [
-            {
-              "name": "route_refid",
-              "value": "701a"
-            },
-            {
-              "name": "route_shortname",
-              "value": "701 North: Sby-Crisfield-PA"
-            },
-            {
-              "name": "route_color",
-              "value": "Lilac"
-            },
-            {
-              "name": "route_estmileage",
-              "value": 69.6
-            }
-          ],
-          [
-            {
-              "name": "route_refid",
-              "value": "111a"
-            },
-            {
-              "name": "route_shortname",
-              "value": "111 South: Sby-PA-UMES"
-            },
-            {
-              "name": "route_color",
-              "value": "Peach"
-            },
-            {
-              "name": "route_estmileage",
-              "value": 62.4
-            }
-          ],
-          [
-            {
-              "name": "route_refid",
-              "value": "451a"
-            },
-            {
-              "name": "route_shortname",
-              "value": "451 Sby-Poc-OC"
-            },
-            {
-              "name": "route_color",
-              "value": "Lime"
-            },
-            {
-              "name": "route_estmileage",
-              "value": 113
-            }
-          ],
-          [
-            {
-              "name": "route_refid",
-              "value": "171a"
-            },
-            {
-              "name": "route_shortname",
-              "value": "171 West Salisbury"
-            },
-            {
-              "name": "route_color",
-              "value": "Blue"
-            },
-            {
-              "name": "route_estmileage",
-              "value": 11.9
-            }
-          ],
-          [
-            {
-              "name": "route_refid",
-              "value": "131a"
-            },
-            {
-              "name": "route_shortname",
-              "value": "131 Southeast Salisbury"
-            },
-            {
-              "name": "route_color",
-              "value": "Green"
-            },
-            {
-              "name": "route_estmileage",
-              "value": 8.71
-            }
-          ]
-        ]
-      };
+        title: 'Chart Title'
+      }
+    },
+    initialize: function() {
+      var self = this
+      $.getJSON(this.get('api'), function(res){
+        var data = self.prepData(res)
+        self.set('data', data)
+      })
+    },
+    prepData: function(res) {
+      var data = {
+        rows: [],
+        columns: []
+      }
+      _.each(res, function(row){
+        data.rows.push({
+          row: row
+        })
+      })
+      data.columns = _.pluck(data.rows[0].row, 'name')
+      return data
     }
   })
 
@@ -146,13 +70,13 @@ $(document).ready(function(){
 
   var chartCollection = new ChartCollection()
   chartCollection.add([
-    {title: "Flying Dutchman"},
-    {title: "Black Pearl"},
-    {title: "Black Pearl"},
-    {title: "Black Pearl"},
-    {title: "Black Pearl"},
-    {title: "Black Pearl"},
-    {title: "Black Pearl"}
+    {title: "Filters"},
+    {title: "Ridership By Route"},
+    {title: "Ridership By Grant"},
+    {title: "Ridership By Shift"},
+    {title: "Ridership By Trip"},
+    {title: "Revenue"},
+    {title: "Ridership By Stop"}
   ])
 
   var Dashboard = Backbone.View.extend({
@@ -162,13 +86,13 @@ $(document).ready(function(){
     render: function(){
       this.mapView = new MapView({el: '.block8'})
       var el = '.block'
+      var block_number = 1
       chartCollection.forEach(function(chart, idx){
-        console.log(chart, idx)
-        console.log(el + (idx+1))
         var view = new ChartView({
           model: chart,
-          el: el + (idx+1)
+          el: el + block_number
         })
+        block_number++
       })
     }
   })
