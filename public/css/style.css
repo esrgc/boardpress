@@ -39,9 +39,21 @@
 
 .dashboard .chart .chart-inner {
   height: 250px;
+  background: #fff;
   overflow-y: auto;
 }
 
 .dashboard .chart .table {
   background: #fff;
 }
+
+.dashboard .chart.filters .chart-inner {
+  padding: 10px;
+  
+}
+
+.dashboard .filters .form-group {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+

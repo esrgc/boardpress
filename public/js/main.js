@@ -1,5 +1,5 @@
 $(document).ready(function(){
-  
+
   var MapView = Backbone.View.extend({
     mapTemplate: $('#map-template').html(),
     initialize: function() {
@@ -12,14 +12,51 @@ $(document).ready(function(){
     },
     makeMap: function() {
       var mapdiv = this.$el.find('.map')[0]
-      var map = L.map(mapdiv).setView([38.35, -75.6], 9);
+      var map = L.map(mapdiv).setView([38.25, -75.5], 10)
 
       L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map)
 
-      L.marker([38.35, -75.6]).addTo(map)
-        .bindPopup('A stop')
+      $.get('/getStopsMap', function(res){
+        _.each(res, function(stop){
+          L.marker([stop.lat, stop.lng]).addTo(map)
+            .bindPopup('<b>Stop</b><br>' + stop.name)
+        })
+      })
+
+      function onEachFeature(feature, layer) {
+        if (feature.properties && feature.properties.Name) {
+          layer.bindPopup('<b>Route</b><br>' + feature.properties.Name);
+        }
+      }
+      $.get('/data/stroutes.json', function(res){
+        L.geoJson(res, {
+            onEachFeature: onEachFeature
+        }).addTo(map);
+      })
+
+    }
+  })
+
+  var FilterModel = Backbone.Model.extend({
+    defaults: function() {
+      return {
+        title: 'Filters'
+      }
+    },
+  })
+
+  var FilterView = Backbone.View.extend({
+    template: $('#filter-template').html(),
+    initialize: function() {
+      this.render()
+    },
+    render: function() {
+      this.$el.html(Mustache.render(this.template, this.model.toJSON(), {
+        title: $('#title-partial').html()
+      }))
+      return this;
     }
   })
 
@@ -30,7 +67,9 @@ $(document).ready(function(){
       this.listenTo(this.model, 'change', this.render);
     },
     render: function() {
-      this.$el.html(Mustache.render(this.chartTemplate, this.model.toJSON()))
+      this.$el.html(Mustache.render(this.chartTemplate, this.model.toJSON(), {
+        title: $('#title-partial').html()
+      }))
       return this;
     }
   })
@@ -52,14 +91,13 @@ $(document).ready(function(){
     prepData: function(res) {
       var data = {
         rows: [],
-        columns: []
+        columns: _.keys(res[0])
       }
       _.each(res, function(row){
         data.rows.push({
-          row: row
+          row: _.values(row)
         })
       })
-      data.columns = _.pluck(data.rows[0].row, 'name')
       return data
     }
   })
@@ -70,13 +108,12 @@ $(document).ready(function(){
 
   var chartCollection = new ChartCollection()
   chartCollection.add([
-    {title: "Filters"},
     {title: "Ridership By Route"},
     {title: "Ridership By Grant"},
-    {title: "Ridership By Shift"},
-    {title: "Ridership By Trip"},
+    {title: "Ridership By Shift", api: '/getShifts'},
+    {title: "Ridership By Trip", api: '/getTrips'},
     {title: "Revenue"},
-    {title: "Ridership By Stop"}
+    {title: "Ridership By Stop", api: '/getStops'}
   ])
 
   var Dashboard = Backbone.View.extend({
@@ -84,9 +121,10 @@ $(document).ready(function(){
       this.render()
     },
     render: function(){
+      this.filterView = new FilterView({el: '.block1', model: new FilterModel()})
       this.mapView = new MapView({el: '.block8'})
       var el = '.block'
-      var block_number = 1
+      var block_number = 2
       chartCollection.forEach(function(chart, idx){
         var view = new ChartView({
           model: chart,

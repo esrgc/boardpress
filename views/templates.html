@@ -1,6 +1,6 @@
 <script type="text/template" id="chart-template">
   <div class="chart">
-    <div class="title"><h3>{{ title }}</h3></div>
+    {{> title}}
     <div class="chart-inner">
       <table class="table table-bordered table-striped table-condensed">
         <thead>
@@ -14,7 +14,7 @@
         {{#data.rows}}
           <tr>
           {{#row}}
-            <td>{{value}}
+            <td>{{.}}
           {{/row}}
           </tr>
         {{/data.rows}}
@@ -26,4 +26,61 @@
 
 <script type="text/template" id="map-template">
   <div class="chart map"></div>
+</script>
+
+<script type="text/template" id="filter-template">
+  <div class="chart filters">
+    {{> title}}
+    <div class="chart-inner">
+      <form class="form-horizontal" role="form">
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Email</label>
+          <div class="col-sm-10">
+            <input type="date" class="form-control" id="startDate">
+            <p class="form-control-static">to</p>
+            <input type="date" class="form-control" id="startDate">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="inlineCheckbox1" value="option1" checked> S
+          </label>
+          <label class="checkbox-inline">
+            <input type="checkbox" id="inlineCheckbox2" value="option2" checked> M
+          </label>
+          <label class="checkbox-inline">
+            <input type="checkbox" id="inlineCheckbox3" value="option3" checked> T
+          </label>
+          <label class="checkbox-inline">
+            <input type="checkbox" id="inlineCheckbox4" value="option1" checked> W
+          </label>
+          <label class="checkbox-inline">
+            <input type="checkbox" id="inlineCheckbox5" value="option2" checked> Th
+          </label>
+          <label class="checkbox-inline">
+            <input type="checkbox" id="inlineCheckbox6" value="option3" checked> F
+          </label>
+          <label class="checkbox-inline">
+            <input type="checkbox" id="inlineCheckbox7" value="option3" checked> S
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="inputPassword" class="col-sm-2 control-label">Rider Type:</label>
+          <div class="col-sm-10">
+            <select class="form-control">
+              <option>All</option>
+              <option>Child</option>
+              <option>Dis</option>
+              <option>RF</option>
+              <option>Vet</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</script>
+
+<script type="text/template" id="title-partial">
+  <div class="title"><h3>{{ title }}</h3></div>
 </script>
