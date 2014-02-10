@@ -11,7 +11,6 @@ var express = require('express')
   , db = require('./db')
 
 var app = express()
-db.connect()
 
 app.configure(function(){
   app.set('port', process.env.PORT || 3000)
@@ -31,6 +30,8 @@ app.configure('development', function(){
 
 app.get('/', routes.index)
 app.get('/getRoutes', api.getRoutes)
+app.get('/getStops', api.getStops)
+app.get('/getStopsMap', api.getStopsMap)
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'))
