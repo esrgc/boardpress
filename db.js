@@ -2,15 +2,6 @@ var Connection = require('tedious').Connection
   , Request = require('tedious').Request
   , config = require('./config/config').db
 
-
-config.options.debug = {
-  data: true,
-  payload: false,
-  token: false,
-  packet: true,
-  log: true
-}
-
 exports.executeStatement = function(statement, next) {
   var connection = new Connection(config)
   connection.on('connect', function(err) {
