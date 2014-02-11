@@ -1,6 +1,20 @@
 var Connection = require('tedious').Connection
   , Request = require('tedious').Request
   , config = require('./config/config').db
+  , fs = require('fs')
+  , path = require('path')
+
+var query_path = path.join(__dirname, '/queries') + '/'
+
+exports.sqlFileToJson = function(file, next) {
+  fs.readFile(query_path + file, function (err, data) {
+    if (err) throw err
+    var statement = data.toString()
+    exports.executeStatement(statement, function(data) {
+      next(data)
+    })
+  })
+}
 
 exports.executeStatement = function(statement, next) {
   var connection = new Connection(config)

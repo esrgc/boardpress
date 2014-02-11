@@ -1,5 +1,6 @@
 var db = require('../db')
 
+
 exports.getRoutes = function(req, res){
   var statement = 'select route_refid as id, route_shortname as name, route_color as color, route_estmileage as mileage from routes'
   db.executeStatement(statement, function(data) {
@@ -31,6 +32,18 @@ exports.getShifts = function(req, res){
 exports.getTrips = function(req, res){
   var statement = 'select trip_refid as id, trip_startdeparttime as depart, trip_endarrivaltime as arrival from trips where tripinservice_id = 1'
   db.executeStatement(statement, function(data) {
+    res.json(data)
+  })
+}
+
+exports.getPassengersByRoute = function(req, res){
+  db.sqlFileToJson('passByRoute.sql', function(data){
+    res.json(data)
+  })
+}
+
+exports.getPassengersByTrip = function(req, res){
+  db.sqlFileToJson('passByTrip.sql', function(data){
     res.json(data)
   })
 }

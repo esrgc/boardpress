@@ -108,10 +108,10 @@ $(document).ready(function(){
 
   var chartCollection = new ChartCollection()
   chartCollection.add([
-    {title: "Ridership By Route"},
+    {title: "Ridership By Route", api: '/getPassengersByRoute'},
     {title: "Ridership By Grant"},
     {title: "Ridership By Shift", api: '/getShifts'},
-    {title: "Ridership By Trip", api: '/getTrips'},
+    {title: "Ridership By Trip", api: '/getPassengersByTrip'},
     {title: "Revenue"},
     {title: "Ridership By Stop", api: '/getStops'}
   ])
