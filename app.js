@@ -35,6 +35,8 @@ app.get('/getShifts', api.getShifts)
 app.get('/getTrips', api.getTrips)
 app.get('/getPassengersByRoute', api.getPassengersByRoute)
 app.get('/getPassengersByTrip', api.getPassengersByTrip)
+app.get('/getPassengersByStop', api.getPassengersByStop)
+app.get('/getPassengersByShift', api.getPassengersByShift)
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'))

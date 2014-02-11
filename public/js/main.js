@@ -110,10 +110,10 @@ $(document).ready(function(){
   chartCollection.add([
     {title: "Ridership By Route", api: '/getPassengersByRoute'},
     {title: "Ridership By Grant"},
-    {title: "Ridership By Shift", api: '/getShifts'},
+    {title: "Ridership By Shift", api: '/getPassengersByShift'},
     {title: "Ridership By Trip", api: '/getPassengersByTrip'},
     {title: "Revenue"},
-    {title: "Ridership By Stop", api: '/getStops'}
+    {title: "Ridership By Stop", api: '/getPassengersByStop'}
   ])
 
   var Dashboard = Backbone.View.extend({

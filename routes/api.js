@@ -47,3 +47,15 @@ exports.getPassengersByTrip = function(req, res){
     res.json(data)
   })
 }
+
+exports.getPassengersByStop = function(req, res){
+  db.sqlFileToJson('passByStop.sql', function(data){
+    res.json(data)
+  })
+}
+
+exports.getPassengersByShift = function(req, res){
+  db.sqlFileToJson('passByShift.sql', function(data){
+    res.json(data)
+  })
+}

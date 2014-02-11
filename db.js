@@ -38,7 +38,6 @@ exports.executeStatement = function(statement, next) {
       connection.execSql(request)
     }
   })
-
 }
 
 /*
