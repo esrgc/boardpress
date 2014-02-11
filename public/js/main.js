@@ -8,7 +8,7 @@ $(document).ready(function(){
     render: function() {
       this.$el.html(Mustache.render(this.mapTemplate))
       this.makeMap()
-      return this;
+      return this
     },
     makeMap: function() {
       var mapdiv = this.$el.find('.map')[0]
@@ -27,13 +27,13 @@ $(document).ready(function(){
 
       function onEachFeature(feature, layer) {
         if (feature.properties && feature.properties.Name) {
-          layer.bindPopup('<b>Route</b><br>' + feature.properties.Name);
+          layer.bindPopup('<b>Route</b><br>' + feature.properties.Name)
         }
       }
       $.get('/data/stroutes.json', function(res){
         L.geoJson(res, {
             onEachFeature: onEachFeature
-        }).addTo(map);
+        }).addTo(map)
       })
 
     }
@@ -56,7 +56,7 @@ $(document).ready(function(){
       this.$el.html(Mustache.render(this.template, this.model.toJSON(), {
         title: $('#title-partial').html()
       }))
-      return this;
+      return this
     }
   })
 
@@ -64,13 +64,13 @@ $(document).ready(function(){
     chartTemplate: $('#chart-template').html(),
     initialize: function() {
       this.render()
-      this.listenTo(this.model, 'change', this.render);
+      this.listenTo(this.model, 'change', this.render)
     },
     render: function() {
       this.$el.html(Mustache.render(this.chartTemplate, this.model.toJSON(), {
         title: $('#title-partial').html()
       }))
-      return this;
+      return this
     }
   })
 

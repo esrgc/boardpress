@@ -30,11 +30,11 @@ exports.executeStatement = function(statement, next) {
           next(rowsToObjectLiteral(rows))
         }
         connection.close()
-      });
+      })
       var rows = []
       request.on('row', function(columns) {
         rows.push(columns)
-      });
+      })
       connection.execSql(request)
     }
   })
