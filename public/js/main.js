@@ -39,41 +39,6 @@ $(document).ready(function(){
     }
   })
 
-  var FilterModel = Backbone.Model.extend({
-    defaults: function() {
-      return {
-        title: 'Filters'
-      }
-    },
-  })
-
-  var FilterView = Backbone.View.extend({
-    template: $('#filter-template').html(),
-    initialize: function() {
-      this.render()
-    },
-    render: function() {
-      this.$el.html(Mustache.render(this.template, this.model.toJSON(), {
-        title: $('#title-partial').html()
-      }))
-      return this
-    }
-  })
-
-  var ChartView = Backbone.View.extend({
-    chartTemplate: $('#chart-template').html(),
-    initialize: function() {
-      this.render()
-      this.listenTo(this.model, 'change', this.render)
-    },
-    render: function() {
-      this.$el.html(Mustache.render(this.chartTemplate, this.model.toJSON(), {
-        title: $('#title-partial').html()
-      }))
-      return this
-    }
-  })
-
   var ChartModel = Backbone.Model.extend({
     defaults: function() {
       return {
@@ -84,9 +49,56 @@ $(document).ready(function(){
     initialize: function() {
       var self = this
       $.getJSON(this.get('api'), function(res){
-        var data = self.prepData(res)
-        self.set('data', data)
+        self.set('data', res)
       })
+    }
+  })
+
+  var ChartCollection = Backbone.Collection.extend({
+    model: ChartModel
+  })
+
+  /* ChartView BaseClass */
+  var ChartView = Backbone.View.extend({
+    template: $('#chart-template').html(),
+    initialize: function() {
+      this.render()
+      this.listenTo(this.model, 'change', this.render)
+    },
+    render: function() {
+      this.$el.html(Mustache.render(this.template, this.model.toJSON(), {
+        title: $('#title-partial').html()
+      }))
+      return this
+    },
+    prepData: function(res) {
+      return res
+    }
+  })
+
+  var FilterModel = Backbone.Model.extend({
+    defaults: function() {
+      return {
+        title: 'Filters'
+      }
+    },
+  })
+
+  var FilterView = ChartView.extend({
+    template: $('#filter-template').html()
+  })
+
+  var TableView = ChartView.extend({
+    template: $('#table-template').html(),
+    render: function() {
+      var attrs = this.model.toJSON()
+      if(attrs.data) {
+        attrs.data = this.prepData(attrs.data)
+      }
+      this.$el.html(Mustache.render(this.template, attrs, {
+        title: $('#title-partial').html()
+      }))
+      return this
     },
     prepData: function(res) {
       var data = {
@@ -102,18 +114,61 @@ $(document).ready(function(){
     }
   })
 
-  var ChartCollection = Backbone.Collection.extend({
-    model: ChartModel
+  var BarChartView = ChartView.extend({
+    initialize: function() {
+      this.render()
+      this.listenTo(this.model, 'change:data', this.update)
+    },
+    render: function() {
+      this.$el.html(Mustache.render(this.template, this.model.toJSON(), {
+        title: $('#title-partial').html()
+      }))
+      this.drawChart()
+      return this
+    },
+    drawChart: function() {
+      var chartel = this.$el.find('.chart-inner').selector
+      this.chart = new GeoDash.BarChartVertical(chartel, {
+        x: 'Name'
+        , y: ['On', 'Off']
+        , colors: ['#F06730', '#66A7E1']
+        , yTickFormat: d3.format(".2s")
+      })
+    },
+    update: function() {
+      this.chart.update(this.prepData(this.model.get('data')))
+    }
+  })
+
+  var LineChartView = BarChartView.extend({
+    drawChart: function() {
+      var chartel = this.$el.find('.chart-inner').selector
+      this.chart = new GeoDash.LineChart(chartel, {
+        x: 'date'
+        , y: ['numCats', 'goalCats']
+        , colors: ['#F06730', '#66A7E1']
+        , interpolate: 'monotone'
+        , xTickFormat: d3.time.format('%Y')
+        , yTicksCount: 5
+      })
+    },
+    prepData: function(res) {
+      var parseDate = d3.time.format('%Y').parse
+      _.each(res, function(obj, idx){
+        obj.date = parseDate(obj.date)
+      })
+      return res
+    }
   })
 
   var chartCollection = new ChartCollection()
   chartCollection.add([
     {title: "Ridership By Route", api: '/getPassengersByRoute'},
-    {title: "Ridership By Grant"},
     {title: "Ridership By Shift", api: '/getPassengersByShift'},
     {title: "Ridership By Trip", api: '/getPassengersByTrip'},
-    {title: "Revenue"},
-    {title: "Ridership By Stop", api: '/getPassengersByStop'}
+    {title: "Ridership By Stop", api: '/getPassengersByStop'},
+    {title: "Ridership By Grant", api: '/getPassengersByGrant'},
+    {title: "Revenue", api: '/getRevenue'}
   ])
 
   var Dashboard = Backbone.View.extend({
@@ -122,15 +177,30 @@ $(document).ready(function(){
     },
     render: function(){
       this.filterView = new FilterView({el: '.block1', model: new FilterModel()})
-      this.mapView = new MapView({el: '.block8'})
-      var el = '.block'
-      var block_number = 2
-      chartCollection.forEach(function(chart, idx){
-        var view = new ChartView({
-          model: chart,
-          el: el + block_number
-        })
-        block_number++
+      this.mapView = new MapView({el: '.block3'})
+      new TableView({
+        model: chartCollection.at(0),
+        el: '.block2'
+      })
+      new BarChartView({
+        model: chartCollection.at(4),
+        el: '.block4'
+      })
+      new TableView({
+        model: chartCollection.at(1),
+        el: '.block5'
+      })
+      new TableView({
+        model: chartCollection.at(2),
+        el: '.block6'
+      })
+      new LineChartView({
+        model: chartCollection.at(5),
+        el: '.block7'
+      })
+      new TableView({
+        model: chartCollection.at(3),
+        el: '.block8'
       })
     }
   })
