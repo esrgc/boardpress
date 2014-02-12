@@ -18,7 +18,7 @@
 .dashboard .chart {
   background: #DAEAF8;
   margin-bottom: 30px;
-  border: 0px solid #DAEAF8;
+  border: 1px solid #ddd;
   border-radius: 2px;
   padding: 5px;
   overflow: hidden;
@@ -38,7 +38,7 @@
 }
 
 .dashboard .chart .chart-inner {
-  height: 250px;
+  height: 258px;
   background: #fff;
   overflow-y: auto;
 }
@@ -55,5 +55,14 @@
 .dashboard .filters .form-group {
   margin-left: 0px;
   margin-right: 0px;
+}
+
+.dashboard .chart .toolbar {
+  float: right;
+  text-align: right;
+}
+
+.dashboard .chart .toolbar .tool:hover {
+  cursor: pointer;
 }
 

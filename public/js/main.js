@@ -1,5 +1,9 @@
 $(document).ready(function(){
 
+  var routeColors = ["#a6cee3","#1f78b4","#b2df8a","#33a02c","#fdbf6f",
+    "#ff7f00","#cab2d6","#6a3d9a","#ffff99","#b15928","#a6cee3","#1f78b4",
+    "#b2df8a","#33a02c","#fdbf6f","#ff7f00"]
+
   var MapView = Backbone.View.extend({
     mapTemplate: $('#map-template').html(),
     initialize: function() {
@@ -15,7 +19,7 @@ $(document).ready(function(){
       var map = L.map(mapdiv).setView([38.25, -75.5], 10)
 
       L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a>'
       }).addTo(map)
 
       $.get('/getStopsMap', function(res){
@@ -25,10 +29,19 @@ $(document).ready(function(){
         })
       })
 
+      var myStyle = {
+        "color": "#f00",
+        "weight": 5,
+        "opacity": 1
+      }
+      var idx = 0
       function onEachFeature(feature, layer) {
         if (feature.properties && feature.properties.Name) {
           layer.bindPopup('<b>Route</b><br>' + feature.properties.Name)
         }
+        if(routeColors[idx]) myStyle.color = routeColors[idx]
+        //layer.setStyle(myStyle)
+        idx = idx + 1
       }
       $.get('/data/stroutes.json', function(res){
         L.geoJson(res, {
@@ -61,6 +74,9 @@ $(document).ready(function(){
   /* ChartView BaseClass */
   var ChartView = Backbone.View.extend({
     template: $('#chart-template').html(),
+    events: {
+      "click .download":  "download"
+    },
     initialize: function() {
       this.render()
       this.listenTo(this.model, 'change', this.render)
@@ -73,6 +89,10 @@ $(document).ready(function(){
     },
     prepData: function(res) {
       return res
+    },
+    download: function(e) {
+      //window.open(this.model.get('api'))
+      window.open(this.model.get('api') + '?csv=true')
     }
   })
 
@@ -96,7 +116,8 @@ $(document).ready(function(){
         attrs.data = this.prepData(attrs.data)
       }
       this.$el.html(Mustache.render(this.template, attrs, {
-        title: $('#title-partial').html()
+        title: $('#title-partial').html(),
+        toolbar: $('#toolbar-partial').html()
       }))
       return this
     },
@@ -121,7 +142,8 @@ $(document).ready(function(){
     },
     render: function() {
       this.$el.html(Mustache.render(this.template, this.model.toJSON(), {
-        title: $('#title-partial').html()
+        title: $('#title-partial').html(),
+        toolbar: $('#toolbar-partial').html()
       }))
       this.drawChart()
       return this
