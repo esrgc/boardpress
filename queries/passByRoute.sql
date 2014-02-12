@@ -17,10 +17,7 @@ from [STRoute].[dbo].[passengers_bystop] a
 left join [STRoute].[dbo].[passengers_bystopdetails] b
 on a.pbs_id = b.pbs_id
 where passType_refid is not null
---{{{filters}}}
---and stopdate between '2013-06-01' and '2013-06-30' (for date range) 
---and datepart(weekday,stopdate) in ('2','3','4','5','6') (for specific day of week; where sunday = 1 and saturday = 7)
---and passType_refid = 'DIS' (for specific passenger type)
+{{{filters}}}
 group by a.route_refid, passType_refid
 ) as magicTable
 pivot

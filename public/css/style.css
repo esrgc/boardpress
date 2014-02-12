@@ -60,12 +60,20 @@
 
 .dashboard .chart.filters .chart-inner {
   padding: 10px;
-  
 }
 
 .dashboard .filters .form-group {
   margin-left: 0px;
   margin-right: 0px;
+  margin-bottom: 5px;
+}
+
+.dashboard .filters .radio-inline+.radio-inline, .checkbox-inline+.checkbox-inline {
+  margin-left: 2px;
+}
+
+.dashboard .filters button[type="submit"] {
+  float: left;
 }
 
 .dashboard .chart .toolbar {
@@ -73,7 +81,12 @@
   text-align: right;
 }
 
+.dashboard .chart .toolbar .tool {
+  padding: 0px;
+}
+
 .dashboard .chart .toolbar .tool:hover {
   cursor: pointer;
+  background: rgba(0, 0, 0, 0.1);
 }
 

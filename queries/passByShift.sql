@@ -10,7 +10,7 @@ on a.pbs_id = b.pbs_id
 left join [STRoute].[dbo].[shifts] c
 on a.shift_refid = c.shift_refid
 where passType_refid is not null
---{{{filters}}}
+{{{filters}}}
 group by c.shift_name, passType_refid
 ) as magicTable
 pivot

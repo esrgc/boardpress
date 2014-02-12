@@ -16,6 +16,7 @@ from (
   on a.BucketInfo_ID = b.BucketInfo_ID
   ) d
   on c.shift_refid = d.shift_refid
---where {{{filters}}} ex:[Day] = 1 or [Date] between X and Y
+  where [Name] is not null
+  {{{filters}}}
   group by [Name]
   order by [Name]

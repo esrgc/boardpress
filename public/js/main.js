@@ -70,8 +70,15 @@ $(document).ready(function(){
       }
     },
     initialize: function() {
+      this.update()
+    },
+    update: function() {
       var self = this
-      $.getJSON(this.get('api'), function(res){
+      var url = this.get('api')
+      if(dashboard.filterView) {
+        url += '?' + dashboard.filterView.model.get('querystring')
+      }
+      $.getJSON(url, function(res){
         self.set('data', res)
       })
     },
@@ -109,7 +116,7 @@ $(document).ready(function(){
     },
     initialize: function() {
       this.render()
-      this.listenTo(this.model, 'change', this.render)
+      this.listenTo(this.model, 'change:data', this.render)
     },
     render: function() {
       this.$el.html(Mustache.render(this.template, this.model.toJSON(), {
@@ -131,13 +138,25 @@ $(document).ready(function(){
   var FilterModel = Backbone.Model.extend({
     defaults: function() {
       return {
-        title: 'Filters'
+        title: 'Filters',
+        querystring: false
       }
     },
   })
 
   var FilterView = ChartView.extend({
-    template: $('#filter-template').html()
+    template: $('#filter-template').html(),
+    events: {
+      'click button[type="submit"]': 'submitForm'
+    },
+    submitForm: function(e){
+      e.preventDefault()
+      var form = $(this.$el.find('form')).serialize()
+      this.model.set('querystring', form)
+      chartCollection.each(function(chart){
+        chart.update()
+      })
+    }
   })
 
   var TableView = ChartView.extend({
@@ -232,18 +251,10 @@ $(document).ready(function(){
   })
 
   var chartCollection = new ChartCollection()
-  chartCollection.add([
-    {title: "Ridership By Route", api: '/getPassengersByRoute'},
-    {title: "Ridership By Shift", api: '/getPassengersByShift'},
-    {title: "Ridership By Trip", api: '/getPassengersByTrip'},
-    {title: "Ridership By Stop", api: '/getPassengersByStop'},
-    {title: "Ridership By Grant", api: '/getPassengersByGrant'},
-    {title: "Revenue", api: '/getRevenue'}
-  ])
 
   var Dashboard = Backbone.View.extend({
     initialize: function(){
-      this.render()
+
     },
     render: function(){
       this.filterView = new FilterView({el: '.block1', model: new FilterModel()})
@@ -276,5 +287,16 @@ $(document).ready(function(){
   })
 
   var dashboard = new Dashboard()
+
+  chartCollection.add([
+    {title: "Ridership By Route", api: '/getPassengersByRoute'},
+    {title: "Ridership By Shift", api: '/getPassengersByShift'},
+    {title: "Ridership By Trip", api: '/getPassengersByTrip'},
+    {title: "Ridership By Stop", api: '/getPassengersByStop'},
+    {title: "Ridership By Grant", api: '/getPassengersByGrant'},
+    {title: "Revenue", api: '/getRevenue'}
+  ])
+
+  dashboard.render()
 
 })

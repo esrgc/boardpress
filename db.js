@@ -1,22 +1,25 @@
 var Connection = require('tedious').Connection
   , Request = require('tedious').Request
+  , TYPES = require('tedious').TYPES
   , config = require('./config/config').db
   , fs = require('fs')
   , path = require('path')
+  , filters = require('./filters')
 
 var query_path = path.join(__dirname, '/queries') + '/'
 
-exports.sqlFileToJson = function(file, next) {
+exports.sqlFileToJson = function(file, parameters, next) {
   fs.readFile(query_path + file, function (err, data) {
     if (err) throw err
     var statement = data.toString()
-    exports.executeStatement(statement, function(data) {
+    query_info = filters.addFilters(statement, parameters)
+    exports.executeStatement(query_info.statement, query_info.parameters, function(data) {
       next(data)
     })
   })
 }
 
-exports.executeStatement = function(statement, next) {
+exports.executeStatement = function(statement, parameters, next) {
   var connection = new Connection(config)
   connection.on('connect', function(err) {
     if(err) {
@@ -31,6 +34,11 @@ exports.executeStatement = function(statement, next) {
         }
         connection.close()
       })
+      if(parameters && parameters.length) {
+        parameters.forEach(function(parameter){
+          request.addParameter(parameter.name, parameter.type, parameter.value);
+        })
+      }
       var rows = []
       request.on('row', function(columns) {
         rows.push(columns)

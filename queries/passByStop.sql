@@ -8,17 +8,13 @@ from [STRoute].[dbo].[passengers_bystop] a
 full join [STRoute].[dbo].[passengers_bystopdetails] b
 on a.pbs_id = b.pbs_id
 where stop_refid is not null
---{{{filters}}}
---and stopdate = '2013-06-01'
---and datepart(weekday, stopdate) = 7
+{{{filters}}}
 group by stop_refid, passType_refid
 ) as magicTable
 pivot
 (SUM([Cnt]) for [Rider] in ([CHILD],[DIS],[ELD],[EMP],[PCA],[RF],[STP],[TCA],[VET],[On])) as pvt
 full join (select stop_refid, sum([PassengersOff]) as [Off] from [STRoute].[dbo].[passengers_bystop]
 --where {{{filters}}}
---and stopdate = '2013-06-01'
---and datepart(weekday, stopdate) = 7
 group by stop_refid) as a
 on [Name] = a.stop_refid
 order by [Name]

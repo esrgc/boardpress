@@ -11,7 +11,7 @@ on a.pbs_id = b.pbs_id
 join [STRoute].[dbo].[trips] d
 on a.trip_refid = d.trip_refid
 where passType_refid is not null
---{{{filters}}}
+{{{filters}}}
 group by d.route_refid + '  ('+isnull(substring(cast(d.trip_startdeparttime as varchar),1,5), '')+ ')', passType_refid
 ) as magicTable
 pivot
