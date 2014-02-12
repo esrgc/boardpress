@@ -128,10 +128,10 @@ $(document).ready(function(){
       return res
     },
     download: function(e) {
-      window.open(this.model.get('api') + '?csv=true')
+      window.open(this.model.get('api') + '?csv=true&'+ dashboard.filterView.model.get('querystring'))
     },
     code: function(e) {
-      window.open(this.model.get('api'))
+      window.open(this.model.get('api') + '?' + dashboard.filterView.model.get('querystring'))
     }
   })
 
@@ -148,6 +148,10 @@ $(document).ready(function(){
     template: $('#filter-template').html(),
     events: {
       'click button[type="submit"]': 'submitForm'
+    },
+    initialize: function() {
+      this.render()
+      this.model.set('querystring', $(this.$el.find('form')).serialize())
     },
     submitForm: function(e){
       e.preventDefault()
