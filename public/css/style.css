@@ -6,7 +6,8 @@
 .header {
   min-height: 120px;
   width: 100%;
-  background: #589CDB url(../img/top.jpg) left bottom repeat-x;
+  background: #589CDB;
+  /*background: #589CDB url(../img/top.jpg) left bottom repeat-x;*/
   color: #fff;
   border-bottom: 5px solid #424242;
 }
@@ -16,7 +17,7 @@
 }
 
 .dashboard .chart {
-  background: #DAEAF8;
+  background: #b9d5f0;
   margin-bottom: 30px;
   border: 1px solid #ddd;
   border-radius: 2px;
@@ -31,6 +32,7 @@
 
 .dashboard .chart .title {
   height: 30px;
+  float: left;
 }
 
 .dashboard .chart .title h3 {
@@ -41,10 +43,19 @@
   height: 258px;
   background: #fff;
   overflow-y: auto;
+  clear: both;
 }
 
 .dashboard .chart .table {
   background: #fff;
+}
+
+.dashboard .chart .table th.sort {
+  
+}
+
+.dashboard .chart .table th:hover {
+  cursor: pointer;
 }
 
 .dashboard .chart.filters .chart-inner {

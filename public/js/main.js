@@ -22,25 +22,33 @@ $(document).ready(function(){
         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a>'
       }).addTo(map)
 
+      var busIcon = L.icon({
+          iconUrl: 'img/bus-18.png',
+          iconRetinaUrl: 'img/bus-18@2x.png',
+          iconSize: [18, 18],
+          popupAnchor: [1, -5]
+      })
+
       $.get('/getStopsMap', function(res){
         _.each(res, function(stop){
-          L.marker([stop.lat, stop.lng]).addTo(map)
-            .bindPopup('<b>Stop</b><br>' + stop.name)
+          L.marker([stop.lat, stop.lng], {icon: busIcon}).addTo(map)
+            .bindPopup('<b>Stop</b><br>' + stop.id + '<br>' + stop.name)
         })
       })
 
       var myStyle = {
-        "color": "#f00",
-        "weight": 5,
+        "color": "#F06730",
+        "weight": 3,
         "opacity": 1
       }
+
       var idx = 0
       function onEachFeature(feature, layer) {
         if (feature.properties && feature.properties.Name) {
-          layer.bindPopup('<b>Route</b><br>' + feature.properties.Name)
+          layer.bindPopup('<b>Route</b><br>' + feature.properties.route_refi + '<br>' + feature.properties.Name)
         }
-        if(routeColors[idx]) myStyle.color = routeColors[idx]
-        //layer.setStyle(myStyle)
+        //if(routeColors[idx]) myStyle.color = routeColors[idx]
+        layer.setStyle(myStyle)
         idx = idx + 1
       }
       $.get('/data/stroutes.json', function(res){
@@ -56,7 +64,9 @@ $(document).ready(function(){
     defaults: function() {
       return {
         api: '/getRoutes',
-        title: 'Chart Title'
+        title: 'Chart Title',
+        sort_key: false,
+        sort_desc: true
       }
     },
     initialize: function() {
@@ -64,6 +74,25 @@ $(document).ready(function(){
       $.getJSON(this.get('api'), function(res){
         self.set('data', res)
       })
+    },
+    sortByKey: function(column) {
+      var data = this.get('data')
+      if(!this.get('sort_key')) {
+        this.set('sort_key', column)
+        this.set('sort_desc', true)
+      } else if(this.get('sort_key') === column) {
+        var sort_order = this.get('sort_desc')
+        this.set('sort_desc', !sort_order)
+      } else if(this.get('sort_key') !== column) {
+        this.set('sort_key', column)
+        this.set('sort_desc', true)
+      }
+      if(this.get('sort_desc')){
+        data = _.sortBy(data, function(obj){ return obj[column] }).reverse()
+      } else {
+        data = _.sortBy(data, function(obj){ return obj[column] })
+      }
+      this.set('data', data)
     }
   })
 
@@ -75,7 +104,8 @@ $(document).ready(function(){
   var ChartView = Backbone.View.extend({
     template: $('#chart-template').html(),
     events: {
-      "click .download":  "download"
+      "click .download":  "download",
+      "click .code":  "code"
     },
     initialize: function() {
       this.render()
@@ -91,8 +121,10 @@ $(document).ready(function(){
       return res
     },
     download: function(e) {
-      //window.open(this.model.get('api'))
       window.open(this.model.get('api') + '?csv=true')
+    },
+    code: function(e) {
+      window.open(this.model.get('api'))
     }
   })
 
@@ -110,7 +142,13 @@ $(document).ready(function(){
 
   var TableView = ChartView.extend({
     template: $('#table-template').html(),
+    events: function(){
+      return _.extend({},ChartView.prototype.events,{
+        'click th' : 'sortByHeader'
+      })
+    },
     render: function() {
+      var self = this
       var attrs = this.model.toJSON()
       if(attrs.data) {
         attrs.data = this.prepData(attrs.data)
@@ -119,6 +157,11 @@ $(document).ready(function(){
         title: $('#title-partial').html(),
         toolbar: $('#toolbar-partial').html()
       }))
+      this.$el.find('th').each(function(idx, th){
+        if(th.innerHTML === self.model.get('sort_key')) {
+          $(th).addClass('sort')
+        }
+      })
       return this
     },
     prepData: function(res) {
@@ -132,6 +175,10 @@ $(document).ready(function(){
         })
       })
       return data
+    },
+    sortByHeader: function(e) {
+      var column = e.target.innerHTML
+      this.model.sortByKey(column)
     }
   })
 
@@ -150,11 +197,12 @@ $(document).ready(function(){
     },
     drawChart: function() {
       var chartel = this.$el.find('.chart-inner').selector
-      this.chart = new GeoDash.BarChartVertical(chartel, {
-        x: 'Name'
-        , y: ['On', 'Off']
+      this.chart = new GeoDash.BarChartHorizontal(chartel, {
+        y: 'Name'
+        , x: ['On', 'Off']
         , colors: ['#F06730', '#66A7E1']
-        , yTickFormat: d3.format(".2s")
+        , xTickFormat: d3.format(".2s")
+        , yWidth: 60
       })
     },
     update: function() {
