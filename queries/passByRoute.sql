@@ -10,6 +10,7 @@ on a.pbs_id = b.pbs_id
 where passType_refid is not null
 --and{{{dateRangeFilter}}}
 --and{{{dayFilter}}}
+--and{{{passFilter}}}
 --and{{{routeFilter}}}
 --and{{{shiftFilter}}}
 --and{{{tripFilter}}}
