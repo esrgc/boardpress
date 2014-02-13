@@ -7,7 +7,8 @@ left join
 from [STRoute].[dbo].[passengers_bystopdetails]
 group by pbs_id) b
 on a.pbs_id = b.pbs_id
---{{{filters}}}
+where b.pbs_id is not null
+{{{filters}}}
 ) c
 left join 
 (select a.shift_refid, b.[BucketName] as [Name]
