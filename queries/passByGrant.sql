@@ -6,16 +6,16 @@ full join
 (select pbs_id, sum(passenger_on_count) passengerOn
 from [STRoute].[dbo].[passengers_bystopdetails]
 where passenger_on_count is not null
---and{{{passFilter}}}
+{{{passFilter}}}
 group by pbs_id) b
 on a.pbs_id = b.pbs_id
 where shift_refid is not null
---and{{{dateRangeFilter}}}
---and{{{dayFilter}}}
---and{{{routeFilter}}}
---and{{{shiftFilter}}}
---and{{{tripFilter}}}
---and{{{stopFilter}}}
+{{{dateRangeFilter}}}
+{{{dayFilter}}}
+{{{routeFilter}}}
+{{{shiftFilter}}}
+{{{tripFilter}}}
+{{{stopFilter}}}
 ) c
 left join 
 (select a.shift_refid, b.[BucketName] as [Name]

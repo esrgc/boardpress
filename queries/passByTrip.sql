@@ -11,13 +11,13 @@ on a.pbs_id = b.pbs_id
 join [STRoute].[dbo].[trips] d
 on a.trip_refid = d.trip_refid
 where passType_refid is not null
---and{{{dateRangeFilter}}}
---and{{{dayFilter}}}
---and{{{passFilter}}}
---and{{{routeFilter}}}
---and{{{shiftFilter}}}
---and{{{tripFilter}}}
---and{{{stopFilter}}}
+{{{dateRangeFilter}}}
+{{{dayFilter}}}
+{{{passFilter}}}
+{{{routeFilter}}}
+{{{shiftFilter}}}
+{{{tripFilter}}}
+{{{stopFilter}}}
 group by d.route_refid + '  ('+isnull(substring(cast(d.trip_startdeparttime as varchar),1,5), '')+ ')', passType_refid
 ) as magicTable
 pivot
@@ -28,12 +28,12 @@ from [STRoute].[dbo].[passengers_bystop] a
 left join [STRoute].[dbo].[trips] d
 on a.trip_refid = d.trip_refid
 where d.route_refid is not null
---and{{{dateRangeFilter}}}
---and{{{dayFilter}}}
---and{{{routeFilter}}}
---and{{{shiftFilter}}}
---and{{{tripFilter}}}
---and{{{stopFilter}}}
+{{{dateRangeFilter}}}
+{{{dayFilter}}}
+{{{routeFilter}}}
+{{{shiftFilter}}}
+{{{tripFilter}}}
+{{{stopFilter}}}
 group by d.route_refid + '  ('+isnull(substring(cast(d.trip_startdeparttime as varchar),1,5), '')+ ')') as a
 on pvt.[Name] = a.[Name]
 order by pvt.[name]

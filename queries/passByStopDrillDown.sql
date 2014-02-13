@@ -8,25 +8,25 @@ from [STRoute].[dbo].[passengers_bystop] a
 full join [STRoute].[dbo].[passengers_bystopdetails] b
 on a.pbs_id = b.pbs_id
 where stop_refid is not null
---and{{{dateRangeFilter}}}
---and{{{dayFilter}}}
---and{{{passFilter}}}
---and{{{routeFilter}}}
---and{{{shiftFilter}}}
---and{{{tripFilter}}}
---and{{{stopFilter}}}
+{{{dateRangeFilter}}}
+{{{dayFilter}}}
+{{{passFilter}}}
+{{{routeFilter}}}
+{{{shiftFilter}}}
+{{{tripFilter}}}
+{{{stopFilter}}}
 group by stop_refid, stop_sequence, passType_refid
 ) as magicTable
 pivot
 (SUM([Cnt]) for [Rider] in ([CHILD],[DIS],[ELD],[EMP],[PCA],[RF],[STP],[TCA],[VET],[On])) as pvt
 full join (select stop_refid, stop_sequence, sum([PassengersOff]) as [Off] from [STRoute].[dbo].[passengers_bystop]
 where stop_refid is not null
---and{{{dateRangeFilter}}}
---and{{{dayFilter}}}
---and{{{routeFilter}}}
---and{{{shiftFilter}}}
---and{{{tripFilter}}}
---and{{{stopFilter}}}
+{{{dateRangeFilter}}}
+{{{dayFilter}}}
+{{{routeFilter}}}
+{{{shiftFilter}}}
+{{{tripFilter}}}
+{{{stopFilter}}}
 group by stop_refid, stop_sequence) as a
 on [Name] = a.stop_refid
 and [Order] = a.stop_sequence

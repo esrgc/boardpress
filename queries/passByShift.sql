@@ -10,25 +10,25 @@ on a.pbs_id = b.pbs_id
 left join [STRoute].[dbo].[shifts] c
 on a.shift_refid = c.shift_refid
 where passType_refid is not null
---and{{{dateRangeFilter}}}
---and{{{dayFilter}}}
---and{{{passFilter}}}
---and{{{routeFilter}}}
---and{{{shiftFilter}}}
---and{{{tripFilter}}}
---and{{{stopFilter}}}
+{{{dateRangeFilter}}}
+{{{dayFilter}}}
+{{{passFilter}}}
+{{{routeFilter}}}
+{{{shiftFilter}}}
+{{{tripFilter}}}
+{{{stopFilter}}}
 group by c.shift_name, passType_refid
 ) as magicTable
 pivot
 (SUM([Cnt]) for [Rider] in ([CHILD],[DIS],[ELD],[EMP],[PCA],[RF],[STP],[TCA],[VET],[TOTAL])) as pvt
 left join (select shift_name, sum([PassengersOff]) [Off] from [STRoute].[dbo].[passengers_bystop] a left join [STRoute].[dbo].[shifts] c on a.shift_refid = c.shift_refid
 where shift_name is not null
---and{{{dateRangeFilter}}}
---and{{{dayFilter}}}
---and{{{routeFilter}}}
---and{{{shiftFilter}}}
---and{{{tripFilter}}}
---and{{{stopFilter}}}
+{{{dateRangeFilter}}}
+{{{dayFilter}}}
+{{{routeFilter}}}
+{{{shiftFilter}}}
+{{{tripFilter}}}
+{{{stopFilter}}}
 group by shift_name) as a
 on [Name] = a.shift_name
 order by [Name]
