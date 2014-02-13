@@ -4,9 +4,9 @@ var mustache = require('mustache')
 
 /*
 *  Filter Names:
-*    passtype_filter
-*    daterange_filter
-*    day_filter
+*    passFilter
+*    dateRangeFilter
+*    dayFilter
 */
 
 exports.addFilters = function(statement, filters) {
@@ -25,7 +25,7 @@ exports.addFilters = function(statement, filters) {
       }
       var clause = "and passType_refid = @" + parameter.name
       parameters.push(parameter)
-      template.passtype_filter = clause
+      template.passFilter = clause
       clauses.push(clause)
     }
     if(filters.startDate || filters.endDate) {
@@ -42,7 +42,7 @@ exports.addFilters = function(statement, filters) {
       var clause = "and stopdate between @" + parameter.name + ' and @' + parameter2.name
       parameters.push(parameter)
       parameters.push(parameter2)
-      template.daterange_filter = clause
+      template.dateRangeFilter = clause
       clauses.push(clause)
     }
     if(filters.days) {
@@ -62,7 +62,7 @@ exports.addFilters = function(statement, filters) {
       })
       clause = clause.substring(0, clause.length - 2) //remove last comma
       clause += ")"
-      template.day_filter = clause
+      template.dayFilter = clause
       clauses.push(clause)
     }
     template.filters = clauses.join(' ')
