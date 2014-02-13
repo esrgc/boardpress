@@ -29,7 +29,7 @@ $(document).ready(function(){
           popupAnchor: [1, -5]
       })
 
-      $.get('/getStopsMap', function(res){
+      $.get('getStopsMap', function(res){
         _.each(res, function(stop){
           L.marker([stop.lat, stop.lng], {icon: busIcon}).addTo(map)
             .bindPopup('<b>Stop</b><br>' + stop.id + '<br>' + stop.name)
@@ -51,7 +51,7 @@ $(document).ready(function(){
         layer.setStyle(myStyle)
         idx = idx + 1
       }
-      $.get('/data/stroutes.json', function(res){
+      $.get('data/stroutes.json', function(res){
         L.geoJson(res, {
             onEachFeature: onEachFeature
         }).addTo(map)
@@ -293,12 +293,12 @@ $(document).ready(function(){
   var dashboard = new Dashboard()
 
   chartCollection.add([
-    {title: "Ridership By Route", api: '/getPassengersByRoute'},
-    {title: "Ridership By Shift", api: '/getPassengersByShift'},
-    {title: "Ridership By Trip", api: '/getPassengersByTrip'},
-    {title: "Ridership By Stop", api: '/getPassengersByStop'},
-    {title: "Ridership By Grant", api: '/getPassengersByGrant'},
-    {title: "Revenue", api: '/getRevenue'}
+    {title: "Ridership By Route", api: 'getPassengersByRoute'},
+    {title: "Ridership By Shift", api: 'getPassengersByShift'},
+    {title: "Ridership By Trip", api: 'getPassengersByTrip'},
+    {title: "Ridership By Stop", api: 'getPassengersByStop'},
+    {title: "Ridership By Grant", api: 'getPassengersByGrant'},
+    {title: "Revenue", api: 'getRevenue'}
   ])
 
   dashboard.render()
