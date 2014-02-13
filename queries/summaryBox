@@ -1,0 +1,12 @@
+select sum([passenger_on_count]) as [Total Passengers], sum([gross_passenger_fare]) as [Gross Revenue]
+from [STRoute].[dbo].[passengers_bystop] a
+join [STRoute].[dbo].[passengers_bystopdetails] b
+on a.pbs_id = b.pbs_id
+where a.pbs_id is not null
+{{{dateRangeFilter}}}
+{{{dayFilter}}}
+{{{passFilter}}}
+{{{routeFilter}}}
+{{{shiftFilter}}}
+{{{tripFilter}}}
+{{{stopFilter}}}
