@@ -36,8 +36,12 @@ exports.addFilters = function(statement, filters) {
       clauses.push(clause)
     }
     if(filters.days) {
+      var days = filters.days
       var clause = "and datepart(weekday,stopdate) in ("
-      filters.days.forEach(function(day, idx){
+      if(typeof days === 'string') {
+        days = [days]
+      }
+      days.forEach(function(day, idx){
         var parameter = {
           name: 'day' + idx,
           value: day,
