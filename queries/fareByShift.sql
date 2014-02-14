@@ -1,4 +1,4 @@
-select {{{[variable]}}}, [Date], sum([Fare]) as [Fare]
+select [{{{variable}}}], [Date], sum([Fare]) as [Fare]
 from (select a.[route_refid] as [Route], a.[shift_refid] as [Shift], [trip_refid] as [Trip]
 , [stop_refid] as [Stop], cast(a.stopdate as date) as [Date], [Fare]
 from [STRoute].[dbo].[passengers_bystop] a
@@ -18,5 +18,5 @@ Where [route_refid] is not null
 {{{tripFilter}}}
 {{{stopFilter}}}
 ) a
-group by {{{[variable]}}}, [Date]
-order by {{{[variable]}}}, [Date]
+group by [{{{[variable]}}}], [Date]
+order by [{{{[variable]}}}], [Date]
