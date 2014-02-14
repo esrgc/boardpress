@@ -237,18 +237,26 @@ $(document).ready(function(){
     drawChart: function() {
       var chartel = this.$el.find('.chart-inner').selector
       this.chart = new GeoDash.LineChart(chartel, {
-        x: 'date'
-        , y: ['numCats', 'goalCats']
-        , colors: ['#F06730', '#66A7E1']
+        x: 'Date'
+        , y: ['111a', '111r']
+        , colors: ["#a6cee3","#1f78b4","#b2df8a","#33a02c","#fb9a99","#e31a1c","#fdbf6f","#ff7f00","#cab2d6","#6a3d9a","#ffff99","#b15928"]
+        , legend: true
         , interpolate: 'monotone'
-        , xTickFormat: d3.time.format('%Y')
+        , xTickFormat: d3.time.format('%d/%m')
         , yTicksCount: 5
       })
     },
     prepData: function(res) {
-      var parseDate = d3.time.format('%Y').parse
+      var lines = []
+      _.each(res, function(el){
+        lines.push(_.keys(_.omit(el, "Date")))
+      })
+      lines = _.uniq(_.flatten(lines))
+      console.log(lines)
+      this.chart.options.y = lines
+      var parseDate = d3.time.format('%Y-%m-%d').parse
       _.each(res, function(obj, idx){
-        obj.date = parseDate(obj.date)
+        obj.Date = parseDate(obj.Date)
       })
       return res
     }
@@ -298,7 +306,7 @@ $(document).ready(function(){
     {title: "Ridership By Trip", api: 'getPassengersByTrip'},
     {title: "Ridership By Stop", api: 'getPassengersByStop'},
     {title: "Ridership By Grant", api: 'getPassengersByGrant'},
-    {title: "Revenue", api: 'getRevenue'}
+    {title: "Revenue", api: 'getFares'}
   ])
 
   dashboard.render()
