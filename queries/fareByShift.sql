@@ -1,23 +1,4 @@
---where {{{[variable]}}} can be [Route],[Shift],[Trip],[Stop]
-declare @cols as nvarchar(max),
-	@query  as nvarchar(max)
-
-set @cols = stuff((select ',' + quotename([Date])
-            from (select distinct cast(stopdate as date) as [Date]
-			from [STRoute].[dbo].[passengers_bystop]
-			where stopdate is not null
-			{{{dateRangeFilter}}}
-			{{{dayFilter}}}
-			) z
-            order by [Date]
-		    for xml path(''))--, type
-           -- ).value('.', 'nvarchar(max)') 
-        ,1,1,'')
-		
-set @query = 
-'select {{{[variable]}}}, ' + @cols + ' 
-from 
-(select {{{[variable]}}}, [Date], sum([Fare]) as [Fare]
+select {{{[variable]}}}, [Date], sum([Fare]) as [Fare]
 from (select a.[route_refid] as [Route], a.[shift_refid] as [Shift], [trip_refid] as [Trip]
 , [stop_refid] as [Stop], cast(a.stopdate as date) as [Date], [Fare]
 from [STRoute].[dbo].[passengers_bystop] a
@@ -38,9 +19,4 @@ Where [route_refid] is not null
 {{{stopFilter}}}
 ) a
 group by {{{[variable]}}}, [Date]
-) as magicTable
-pivot
-(sum([Fare]) for [Date] in (' + @cols + ')) as pvt
-order by {{{[variable]}}}'
-
-execute(@query)
+order by {{{[variable]}}}, [Date]
