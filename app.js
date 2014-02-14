@@ -38,7 +38,6 @@ app.get('/getPassengersByTrip', api.getPassengersByTrip)
 app.get('/getPassengersByStop', api.getPassengersByStop)
 app.get('/getPassengersByShift', api.getPassengersByShift)
 app.get('/getPassengersByGrant', api.getPassengersByGrant)
-app.get('/getRevenue', api.getRevenue)
 app.get('/getFares', api.getFares)
 
 http.createServer(app).listen(app.get('port'), function(){
