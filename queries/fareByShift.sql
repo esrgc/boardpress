@@ -18,5 +18,5 @@ Where [route_refid] is not null
 {{{tripFilter}}}
 {{{stopFilter}}}
 ) a
-group by [{{{[variable]}}}], [Date]
-order by [{{{[variable]}}}], [Date]
+group by [{{{variable}}}], [Date]
+order by [{{{variable}}}], [Date]
