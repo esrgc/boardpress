@@ -126,3 +126,20 @@ exports.getPassengersByShift = function(req, res){
     returnData(req, res, data)
   })
 }
+
+exports.getFares = function(req, res){
+  db.sqlFileToJson('fareByShift.sql', req.query, function(data){
+    var newdata = []
+    var dates = _.uniq(_.pluck(data, "Date"))
+    dates.forEach(function(date){
+      var rows = _.where(data, {"Date": date})
+      var obj = {"Date": date}
+      rows.forEach(function(row){
+        obj[row.variable] = row.Fare
+      })
+      newdata.push(obj)
+    })
+    newdata = _.sortBy(newdata, function(obj){ return new Date(obj.Date) })
+    returnData(req, res, newdata)
+  })
+}
