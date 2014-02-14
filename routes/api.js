@@ -56,47 +56,6 @@ exports.getTrips = function(req, res){
   })
 }
 
-exports.getRevenue = function(req, res){
-  var data = [
-    {
-      'date':'2007',
-      'numCats':92817,
-      'goalCats': 100000
-    },
-    {
-      'date':'2008',
-      'numCats':82705,
-      'goalCats': 100000
-    },
-    {
-      'date':'2009',
-      'numCats':75920,
-      'goalCats': 100000
-    },
-    {
-      'date':'2010',
-      'numCats':76920,
-      'goalCats': 100000
-    },
-    {
-      'date':'2011',
-      'numCats':84123,
-      'goalCats': 100000
-    },
-    {
-      'date':'2012',
-      'numCats':99109,
-      'goalCats': 100000
-    },
-    {
-      'date':'2013',
-      'numCats':145897,
-      'goalCats': 100000
-    }
-  ]
-  returnData(req, res, data)
-}
-
 exports.getPassengersByGrant = function(req, res){
   db.sqlFileToJson('passByGrant.sql', req.query, function(data){
     returnData(req, res, data)

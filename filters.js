@@ -8,12 +8,13 @@ var mustache = require('mustache')
 *    dateRangeFilter
 *    dayFilter
 *    variable
+*    routeFilter
 */
 
 exports.addFilters = function(statement, filters) {
   var template = {
     filters: '',
-    variable: 'Route'
+    variable: 'route'
   }
   var clauses = []
     , parameters = []
@@ -79,6 +80,54 @@ exports.addFilters = function(statement, filters) {
     if(x[filters.by]) {
       template.variable = x[filters.by]
     }
+  }
+  if(filters.route) {
+    var parameter = {
+      name: 'routeid',
+      value: filters.route,
+      type: TYPES.VarChar
+    }
+    var clause = "and route_refid = @" + parameter.name
+    parameters.push(parameter)
+    template.routeFilter = clause
+    template.variable = 'route'
+    clauses.push(clause)
+  }
+  if(filters.trip) {
+    var parameter = {
+      name: 'tripid',
+      value: filters.trip,
+      type: TYPES.VarChar
+    }
+    var clause = "and trip_refid = @" + parameter.name
+    parameters.push(parameter)
+    template.tripFilter = clause
+    template.variable = 'trip'
+    clauses.push(clause)
+  }
+  if(filters.shift) {
+    var parameter = {
+      name: 'shiftid',
+      value: filters.shift,
+      type: TYPES.VarChar
+    }
+    var clause = "and shift_refid = @" + parameter.name
+    parameters.push(parameter)
+    template.shiftFilter = clause
+    template.variable = 'shift'
+    clauses.push(clause)
+  }
+  if(filters.stop) {
+    var parameter = {
+      name: 'stopid',
+      value: filters.stop,
+      type: TYPES.VarChar
+    }
+    var clause = "and stop_refid = @" + parameter.name
+    parameters.push(parameter)
+    template.stopFilter = clause
+    template.variable = 'Stop'
+    clauses.push(clause)
   }
   statement = mustache.render(statement, template)
   console.log(statement)

@@ -75,8 +75,13 @@ $(document).ready(function(){
     update: function() {
       var self = this
       var url = this.get('api')
+
       if(dashboard.filterView) {
-        url += '?' + dashboard.filterView.model.get('querystring')
+        console.log(dashboard.filterView.model.toJSON())
+        console.log($.param(dashboard.filterView.model.toJSON()))
+        var querystring = $.param(dashboard.filterView.model.toJSON())
+        url += '?' + querystring
+        console.log(url)
       }
       $.getJSON(url, function(res){
         self.set('data', res)
@@ -128,18 +133,20 @@ $(document).ready(function(){
       return res
     },
     download: function(e) {
-      window.open(this.model.get('api') + '?csv=true&'+ dashboard.filterView.model.get('querystring'))
+      var querystring = $.param(dashboard.filterView.model.toJSON())
+      var url = this.model.get('api') + '?csv=true&' + querystring
+      window.open(url)
     },
     code: function(e) {
-      window.open(this.model.get('api') + '?' + dashboard.filterView.model.get('querystring'))
+      var querystring = $.param(dashboard.filterView.model.toJSON())
+      var url = this.model.get('api') + '?' + querystring
+      window.open(url)
     }
   })
 
   var FilterModel = Backbone.Model.extend({
     defaults: function() {
       return {
-        title: 'Filters',
-        querystring: false
       }
     },
   })
@@ -147,17 +154,44 @@ $(document).ready(function(){
   var FilterView = ChartView.extend({
     template: $('#filter-template').html(),
     events: {
-      'click button[type="submit"]': 'submitForm'
+      'click button[type="submit"]': 'submitForm',
+      'click button.clear': 'clear'
     },
     initialize: function() {
       this.render()
-      this.model.set('querystring', $(this.$el.find('form')).serialize())
+      this.listenTo(this.model, 'change', this.update)
+    },
+    render: function() {
+      var attrs = this.model.toJSON()
+      attrs.title = 'Filters'
+      this.$el.html(Mustache.render(this.template, attrs, {
+        title: $('#title-partial').html()
+      }))
+      return this
+    },
+    update: function() {
+
+    },
+    clear: function(e) {
+      e.preventDefault()
+      this.model.clear()
+      dashboard.chartCollection.each(function(chart){
+        chart.update()
+      })
     },
     submitForm: function(e){
+      var self = this
       e.preventDefault()
-      var form = $(this.$el.find('form')).serialize()
-      this.model.set('querystring', form)
-      chartCollection.each(function(chart){
+      var filters = $(this.$el.find('form')).serializeArray()
+      var days = []
+      this.$el.find('input[name="days"]:checked').each(function(i, el){
+        days.push($(el).val())
+      })
+      _.each(filters, function(filter){
+        self.model.set(filter.name, filter.value)
+      })
+      self.model.set('days', days)
+      dashboard.chartCollection.each(function(chart){
         chart.update()
       })
     }
@@ -167,7 +201,8 @@ $(document).ready(function(){
     template: $('#table-template').html(),
     events: function(){
       return _.extend({},ChartView.prototype.events,{
-        'click th' : 'sortByHeader'
+        'click th' : 'sortByHeader',
+        'click td.grouper' : 'setGroupBy'
       })
     },
     render: function() {
@@ -184,6 +219,10 @@ $(document).ready(function(){
         if(th.innerHTML === self.model.get('sort_key')) {
           $(th).addClass('sort')
         }
+      })
+      this.$el.find('tbody tr').each(function(idx, tr){
+        var first = $(tr).find('td')[0]
+        $(first).addClass('grouper')
       })
       return this
     },
@@ -202,6 +241,14 @@ $(document).ready(function(){
     sortByHeader: function(e) {
       var column = e.target.innerHTML
       this.model.sortByKey(column)
+    },
+    setGroupBy: function(e){
+      var groupBy = this.model.get('groupBy')
+      var value = $(e.target).html()
+      dashboard.filterView.model.set(groupBy, value)
+      dashboard.chartCollection.each(function(chart){
+        chart.update()
+      })
     }
   })
 
@@ -252,7 +299,6 @@ $(document).ready(function(){
         lines.push(_.keys(_.omit(el, "Date")))
       })
       lines = _.uniq(_.flatten(lines))
-      console.log(lines)
       this.chart.options.y = lines
       var parseDate = d3.time.format('%Y-%m-%d').parse
       _.each(res, function(obj, idx){
@@ -262,8 +308,6 @@ $(document).ready(function(){
     }
   })
 
-  var chartCollection = new ChartCollection()
-
   var Dashboard = Backbone.View.extend({
     initialize: function(){
 
@@ -271,43 +315,43 @@ $(document).ready(function(){
     render: function(){
       this.filterView = new FilterView({el: '.block1', model: new FilterModel()})
       this.mapView = new MapView({el: '.block3'})
+      this.chartCollection = new ChartCollection()
+      this.chartCollection.add([
+        {title: "Ridership By Route", api: 'getPassengersByRoute', groupBy: 'route'},
+        {title: "Ridership By Shift", api: 'getPassengersByShift', groupBy: 'shift'},
+        {title: "Ridership By Trip", api: 'getPassengersByTrip', groupBy: 'trip'},
+        {title: "Ridership By Stop", api: 'getPassengersByStop', groupBy: 'stop'},
+        {title: "Ridership By Grant", api: 'getPassengersByGrant'},
+        {title: "Revenue", api: 'getFares'}
+      ])
       new TableView({
-        model: chartCollection.at(0),
+        model: this.chartCollection.at(0),
         el: '.block2'
       })
       new BarChartView({
-        model: chartCollection.at(4),
+        model: this.chartCollection.at(4),
         el: '.block4'
       })
       new TableView({
-        model: chartCollection.at(1),
+        model: this.chartCollection.at(1),
         el: '.block5'
       })
       new TableView({
-        model: chartCollection.at(2),
+        model: this.chartCollection.at(2),
         el: '.block6'
       })
       new LineChartView({
-        model: chartCollection.at(5),
+        model: this.chartCollection.at(5),
         el: '.block7'
       })
       new TableView({
-        model: chartCollection.at(3),
+        model: this.chartCollection.at(3),
         el: '.block8'
       })
     }
   })
 
   var dashboard = new Dashboard()
-
-  chartCollection.add([
-    {title: "Ridership By Route", api: 'getPassengersByRoute'},
-    {title: "Ridership By Shift", api: 'getPassengersByShift'},
-    {title: "Ridership By Trip", api: 'getPassengersByTrip'},
-    {title: "Ridership By Stop", api: 'getPassengersByStop'},
-    {title: "Ridership By Grant", api: 'getPassengersByGrant'},
-    {title: "Revenue", api: 'getFares'}
-  ])
 
   dashboard.render()
 

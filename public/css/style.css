@@ -58,6 +58,10 @@
   cursor: pointer;
 }
 
+.dashboard .chart .table td.grouper:hover {
+  cursor: pointer;
+}
+
 .dashboard .chart.filters .chart-inner {
   padding: 10px;
 }
@@ -72,9 +76,15 @@
   margin-left: 2px;
 }
 
-.dashboard .filters button[type="submit"] {
+.dashboard .filters button {
   float: left;
+  margin-right: 5px;
+  margin-bottom: 5px;
 }
+
+.dashboard .filters button.clear {
+}
+
 
 .dashboard .chart .toolbar {
   float: right;
