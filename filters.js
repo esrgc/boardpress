@@ -7,11 +7,13 @@ var mustache = require('mustache')
 *    passFilter
 *    dateRangeFilter
 *    dayFilter
+*    variable
 */
 
 exports.addFilters = function(statement, filters) {
   var template = {
-    filters: ''
+    filters: '',
+    variable: 'Route'
   }
   var clauses = []
     , parameters = []
@@ -67,7 +69,19 @@ exports.addFilters = function(statement, filters) {
     }
     template.filters = clauses.join(' ')
   }
+  if(filters.by) {
+    var x = {
+      "route": "Route",
+      "shift": "Shift",
+      "trip": "Trip",
+      "stop": "Stop"
+    }
+    if(x[filters.by]) {
+      template.variable = x[filters.by]
+    }
+  }
   statement = mustache.render(statement, template)
+  console.log(statement)
   return {
     statement: statement,
     parameters: parameters
