@@ -26,7 +26,7 @@ exports.addFilters = function(statement, filters) {
         value: filters.passType,
         type: TYPES.VarChar
       }
-      var clause = "and passType_refid = @" + parameter.name
+      var clause = "and b.passType_refid = @" + parameter.name
       parameters.push(parameter)
       template.passFilter = clause
       clauses.push(clause)
@@ -87,7 +87,7 @@ exports.addFilters = function(statement, filters) {
       value: filters.route,
       type: TYPES.VarChar
     }
-    var clause = "and route_refid = @" + parameter.name
+    var clause = "and a.route_refid = @" + parameter.name
     parameters.push(parameter)
     template.routeFilter = clause
     template.variable = 'route'
@@ -99,7 +99,7 @@ exports.addFilters = function(statement, filters) {
       value: filters.trip,
       type: TYPES.VarChar
     }
-    var clause = "and trip_refid = @" + parameter.name
+    var clause = "and a.trip_refid = @" + parameter.name
     parameters.push(parameter)
     template.tripFilter = clause
     template.variable = 'trip'
@@ -111,7 +111,7 @@ exports.addFilters = function(statement, filters) {
       value: filters.shift,
       type: TYPES.VarChar
     }
-    var clause = "and shift_refid = @" + parameter.name
+    var clause = "and a.shift_refid = @" + parameter.name
     parameters.push(parameter)
     template.shiftFilter = clause
     template.variable = 'shift'
@@ -123,7 +123,7 @@ exports.addFilters = function(statement, filters) {
       value: filters.stop,
       type: TYPES.VarChar
     }
-    var clause = "and stop_refid = @" + parameter.name
+    var clause = "and a.stop_refid = @" + parameter.name
     parameters.push(parameter)
     template.stopFilter = clause
     template.variable = 'Stop'

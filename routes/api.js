@@ -36,8 +36,13 @@ exports.getStops = function(req, res){
 }
 
 exports.getStopsMap = function(req, res){
-  var statement = 'select stop_refid as id, stop_name as name, stop_lat as lat, stop_lon as lng from stops'
   db.sqlFileToJson('getStopsMap.sql', req.query, function(data){
+    returnData(req, res, data)
+  })
+}
+
+exports.getRoutesMap = function(req, res){
+  db.sqlFileToJson('getRoutesMap.sql', req.query, function(data){
     returnData(req, res, data)
   })
 }

@@ -25,9 +25,36 @@
   overflow: hidden;
 }
 
+.dashboard .chart.summary {
+  background: #fff;
+  text-align: left;
+  margin-bottom: 0px;
+  border-top: 1px solid #ddd;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  border-bottom: none;
+  -webkit-border-top-left-radius: 2px;
+  -webkit-border-bottom-left-radius: 0px;
+  -webkit-border-top-right-radius: 2px;
+  -webkit-border-bottom-right-radius: 0px;
+  -moz-border-radius-topleft: 2px;
+  -moz-border-radius-topright: 2px;
+  -moz-border-bottom-left-radius: 0px;
+  -moz-border-bottom-right-radius: 0px;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+
+.dashboard .chart.summary .label i:hover {
+  cursor: pointer;
+}
+
 .dashboard .chart.map {
-  height: 630px;
+  height: 598px;
   background: #fdede7;
+  border-radius: 0px;
 }
 
 .dashboard .chart .title {

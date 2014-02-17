@@ -24,38 +24,19 @@ $(document).ready(function(){
     makeMap: function() {
       var self = this
       var mapdiv = this.$el.find('.map')[0]
-      var map = L.map(mapdiv).setView([38.25, -75.5], 10)
+      this.map = L.map(mapdiv).setView([38.25, -75.5], 10)
 
-      L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a>'
-      }).addTo(map)
+      L.tileLayer('http://{s}.tiles.mapbox.com/v3/esrgc.map-y9awf40v/{z}/{x}/{y}.png')
+        .addTo(this.map)
 
       this.stopLayer = new L.featureGroup()
-      map.addLayer(this.stopLayer)
+      this.map.addLayer(this.stopLayer)
 
-      $.get('getStopsMap', function(res){
-        self.addStops(res)
-      })
+      this.routesLayer = new L.geoJson()
 
-      var myStyle = {
-        "color": "#F06730",
-        "weight": 3,
-        "opacity": 1
-      }
-
-      var idx = 0
-      function onEachFeature(feature, layer) {
-        if (feature.properties && feature.properties.Name) {
-          layer.bindPopup('<b>Route</b><br>' + feature.properties.route_refi + '<br>' + feature.properties.Name)
-        }
-        if(routeColors[idx]) myStyle.color = routeColors[idx]
-        layer.setStyle(myStyle)
-        idx = idx + 1
-      }
       $.get('data/stroutes.json', function(res){
-        L.geoJson(res, {
-            onEachFeature: onEachFeature
-        }).addTo(map)
+        self.routesGeoJSON = res
+        self.update()
       })
     },
     addStops: function(stops) {
@@ -66,20 +47,59 @@ $(document).ready(function(){
           .bindPopup('<b>Stop</b><br>' + stop.id + '<br>' + stop.name)
         self.stopLayer.addLayer(m)
       })
+      if(stops.length > 1) {
+        var bounds = self.stopLayer.getBounds()
+        self.map.fitBounds(bounds)
+      } else if(stops.length == 1) {
+        self.map.setView([stops[0].lat, stops[0].lng], 14)
+      }
+
+    },
+    addRoutes: function(routes) {
+      var self = this
+      var idx = 0
+      , myStyle = {
+        "color": "#F06730",
+        "weight": 3,
+        "opacity": 1
+      }
+      , onEachFeature = function(feature, layer) {
+        if (feature.properties && feature.properties.Name) {
+          layer.bindPopup('<b>Route</b><br>' + feature.properties.route_refi + '<br>' + feature.properties.Name)
+        }
+        if(routeColors[idx]) myStyle.color = routeColors[idx]
+        layer.setStyle(myStyle)
+        idx = idx + 1
+      },
+      filter = function(feature, layer){
+        if(self.routesToShow.indexOf(feature.properties.route_refi) >= 0) {
+          return true
+        } else {
+          return false
+        }
+      }
+      this.routesLayer.clearLayers()
+      this.routesLayer = L.geoJson(routes, {
+          onEachFeature: onEachFeature,
+          filter: filter
+      }).addTo(this.map)
     },
     update: function() {
-      console.log('map update')
       var self = this
       var url = 'getStopsMap'
-
+      var routesurl = 'getRoutesMap'
       if(dashboard.filterView) {
         var querystring = $.param(dashboard.filterView.model.toJSON())
         url += '?' + querystring
+        routesurl += '?' + querystring
       }
-      console.log(url)
       $.getJSON(url, function(res){
-        console.log(res)
         self.addStops(res)
+      })
+
+      $.getJSON(routesurl, function(res){
+        self.routesToShow = _.pluck(res, 'id')
+        self.addRoutes(self.routesGeoJSON)
       })
     }
   })
@@ -95,6 +115,7 @@ $(document).ready(function(){
     },
     initialize: function() {
       this.update()
+      this.listenTo(dashboard.filterView.model, 'change', this.update)
     },
     update: function() {
       var self = this
@@ -133,7 +154,6 @@ $(document).ready(function(){
     model: ChartModel
   })
 
-  /* ChartView BaseClass */
   var ChartView = Backbone.View.extend({
     template: $('#chart-template').html(),
     events: {
@@ -172,6 +192,10 @@ $(document).ready(function(){
     },
   })
 
+  var FilterCollection = Backbone.Collection.extend({
+    model: FilterModel
+  })
+
   var FilterView = ChartView.extend({
     template: $('#filter-template').html(),
     events: {
@@ -188,6 +212,7 @@ $(document).ready(function(){
       this.$el.html(Mustache.render(this.template, attrs, {
         title: $('#title-partial').html()
       }))
+      this.getAttributes()
       return this
     },
     update: function() {
@@ -196,25 +221,25 @@ $(document).ready(function(){
     clear: function(e) {
       e.preventDefault()
       this.model.clear()
-      dashboard.chartCollection.each(function(chart){
-        chart.update()
-      })
+      this.render()
     },
-    submitForm: function(e){
+    getAttributes: function() {
       var self = this
-      e.preventDefault()
       var filters = $(this.$el.find('form')).serializeArray()
       var days = []
       this.$el.find('input[name="days"]:checked').each(function(i, el){
         days.push($(el).val())
       })
+      var newModelAttributes = []
       _.each(filters, function(filter){
-        self.model.set(filter.name, filter.value)
+        newModelAttributes[filter.name] = filter.value
       })
-      self.model.set('days', days)
-      dashboard.chartCollection.each(function(chart){
-        chart.update()
-      })
+      newModelAttributes.days = days
+      self.model.set(newModelAttributes)
+    },
+    submitForm: function(e){
+      e.preventDefault()
+      this.getAttributes()
     }
   })
 
@@ -248,16 +273,28 @@ $(document).ready(function(){
       return this
     },
     prepData: function(res) {
-      var data = {
+      var table = {
         rows: [],
-        columns: _.keys(res[0])
+        columns: []
       }
-      _.each(res, function(row){
-        data.rows.push({
-          row: _.values(row)
+      if(res.length) {
+        var data = []
+        _.each(res, function(row){
+          data.push(_.omit(row, ['ID', 'Long']))
         })
-      })
-      return data
+        var columns = _.keys(data[0])
+        var index = columns.indexOf('Short')
+        if(index !== -1){
+          columns[index] = 'Name'
+        }
+        table.columns = columns
+        _.each(data, function(row){
+          table.rows.push({
+            row: _.values(row)
+          })
+        })
+      }
+      return table
     },
     sortByHeader: function(e) {
       var column = e.target.innerHTML
@@ -265,8 +302,9 @@ $(document).ready(function(){
     },
     setGroupBy: function(e){
       var groupBy = this.model.get('groupBy')
-      var value = $(e.target).html()
-      dashboard.filterView.model.set(groupBy, value)
+      var value = $('<div />').html($(e.target).html()).text()
+      var key = _.where(this.model.get('data'), {'Short': value})[0]['ID']
+      dashboard.filterView.model.set(groupBy, key)
       dashboard.chartCollection.each(function(chart){
         chart.update()
       })
@@ -309,8 +347,8 @@ $(document).ready(function(){
         , y: ['111a', '111r']
         , colors: ["#a6cee3","#1f78b4","#b2df8a","#33a02c","#fb9a99","#e31a1c","#fdbf6f","#ff7f00","#cab2d6","#6a3d9a","#ffff99","#b15928"]
         , legend: true
-        , interpolate: 'monotone'
-        , xTickFormat: d3.time.format('%d/%m')
+        , interpolate: 'none'
+        , xTickFormat: d3.time.format('%m/%d')
         , yTicksCount: 5
       })
     },
@@ -329,12 +367,53 @@ $(document).ready(function(){
     }
   })
 
+  var SummaryView = Backbone.View.extend({
+    template: $('#summary-template').html(),
+    events: {
+      'click .remove': 'removeFilter'
+    },
+    initialize: function() {
+      this.render()
+      this.listenTo(this.model, 'change', this.render)
+    },
+    render: function() {
+      var tmp = {
+        filters: []
+      }
+      var data = this.model.toJSON()
+      var keys = _.keys(data)
+      _.each(keys, function(key){
+        tmp.filters.push({
+          name: key,
+          value: data[key]
+        })
+      })
+      this.$el.html(Mustache.render(this.template, tmp))
+      if(keys.length === 0) {
+        this.$el.find('.chart').html('All')
+      }
+      return this
+    },
+    removeFilter: function(e) {
+      console.log(e)
+    }
+  })
+
   var Dashboard = Backbone.View.extend({
     initialize: function(){
 
     },
     render: function(){
-      this.filterView = new FilterView({el: '.block1', model: new FilterModel()})
+      this.filterCollection = new FilterCollection()
+      this.filterCollection.add([
+        {name: "startDate", value: '1970-01-01'},
+        {name: "endDate", value: '2015-01-01'},
+        {name: "days", value: ['1', '2', '3', '4', '5', '6', '7']},
+        {name: "passType", value: 'All'}
+      ])
+      this.filterModel = new FilterModel()
+      this.filterView = new FilterView({el: '.block1', model: this.filterModel})
+      this.summaryView = new SummaryView({el: '.block9', model: this.filterModel})
       this.mapView = new MapView({el: '.block3'})
       this.chartCollection = new ChartCollection()
       this.chartCollection.add([

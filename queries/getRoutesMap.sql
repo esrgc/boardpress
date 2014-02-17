@@ -1,10 +1,10 @@
-select distinct a.stop_refid as id, c.stop_name as name, c.stop_lat as lat, c.stop_lon as lng 
+select distinct a.route_refid as id
 from passengers_bystop a
 join passengers_bystopdetails b
 on a.pbs_id = b.pbs_id
-join stops c
-on a.stop_refid = c.stop_refid
-where a.stop_refid is not null
+join routes c
+on a.route_refid = c.route_refid
+where a.route_refid is not null
 {{{dateRangeFilter}}}
 {{{dayFilter}}}
 {{{passFilter}}}
