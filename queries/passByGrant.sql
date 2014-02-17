@@ -1,15 +1,14 @@
---REQUEST ST: Breakout by Funding Source � basically a total of passengers on and off and for a period of time by funding source usually a month.
 select * from (select [Name], sum(c.passengerOn) as [On], sum(c.passengersOff) as [Off]
 from (select a.shift_refid, b.passengerOn, a.passengersOff
 from [STRoute].[dbo].[passengers_bystop] a
 full join 
-(select pbs_id, sum(passenger_on_count) passengerOn
-from [STRoute].[dbo].[passengers_bystopdetails]
-where passenger_on_count is not null
+(select b.pbs_id, sum(b.passenger_on_count) passengerOn
+from [STRoute].[dbo].[passengers_bystopdetails] b
+where b.passenger_on_count is not null
 {{{passFilter}}}
-group by pbs_id) b
+group by b.pbs_id) b
 on a.pbs_id = b.pbs_id
-where shift_refid is not null
+where a.shift_refid is not null
 {{{dateRangeFilter}}}
 {{{dayFilter}}}
 {{{routeFilter}}}
