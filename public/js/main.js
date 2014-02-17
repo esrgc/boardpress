@@ -6,8 +6,15 @@ $(document).ready(function(){
 
   var MapView = Backbone.View.extend({
     mapTemplate: $('#map-template').html(),
+    busIcon: L.icon({
+      iconUrl: 'img/bus-18.png',
+      iconRetinaUrl: 'img/bus-18@2x.png',
+      iconSize: [18, 18],
+      popupAnchor: [1, -5]
+    }),
     initialize: function() {
       this.render()
+      this.listenTo(dashboard.filterView.model, 'change', this.update)
     },
     render: function() {
       this.$el.html(Mustache.render(this.mapTemplate))
@@ -15,6 +22,7 @@ $(document).ready(function(){
       return this
     },
     makeMap: function() {
+      var self = this
       var mapdiv = this.$el.find('.map')[0]
       var map = L.map(mapdiv).setView([38.25, -75.5], 10)
 
@@ -22,18 +30,11 @@ $(document).ready(function(){
         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a>'
       }).addTo(map)
 
-      var busIcon = L.icon({
-          iconUrl: 'img/bus-18.png',
-          iconRetinaUrl: 'img/bus-18@2x.png',
-          iconSize: [18, 18],
-          popupAnchor: [1, -5]
-      })
+      this.stopLayer = new L.featureGroup()
+      map.addLayer(this.stopLayer)
 
       $.get('getStopsMap', function(res){
-        _.each(res, function(stop){
-          L.marker([stop.lat, stop.lng], {icon: busIcon}).addTo(map)
-            .bindPopup('<b>Stop</b><br>' + stop.id + '<br>' + stop.name)
-        })
+        self.addStops(res)
       })
 
       var myStyle = {
@@ -47,7 +48,7 @@ $(document).ready(function(){
         if (feature.properties && feature.properties.Name) {
           layer.bindPopup('<b>Route</b><br>' + feature.properties.route_refi + '<br>' + feature.properties.Name)
         }
-        //if(routeColors[idx]) myStyle.color = routeColors[idx]
+        if(routeColors[idx]) myStyle.color = routeColors[idx]
         layer.setStyle(myStyle)
         idx = idx + 1
       }
@@ -56,7 +57,30 @@ $(document).ready(function(){
             onEachFeature: onEachFeature
         }).addTo(map)
       })
+    },
+    addStops: function(stops) {
+      var self = this
+      this.stopLayer.clearLayers()
+      _.each(stops, function(stop){
+        var m = L.marker([stop.lat, stop.lng], {icon: self.busIcon})
+          .bindPopup('<b>Stop</b><br>' + stop.id + '<br>' + stop.name)
+        self.stopLayer.addLayer(m)
+      })
+    },
+    update: function() {
+      console.log('map update')
+      var self = this
+      var url = 'getStopsMap'
 
+      if(dashboard.filterView) {
+        var querystring = $.param(dashboard.filterView.model.toJSON())
+        url += '?' + querystring
+      }
+      console.log(url)
+      $.getJSON(url, function(res){
+        console.log(res)
+        self.addStops(res)
+      })
     }
   })
 
@@ -77,11 +101,8 @@ $(document).ready(function(){
       var url = this.get('api')
 
       if(dashboard.filterView) {
-        console.log(dashboard.filterView.model.toJSON())
-        console.log($.param(dashboard.filterView.model.toJSON()))
         var querystring = $.param(dashboard.filterView.model.toJSON())
         url += '?' + querystring
-        console.log(url)
       }
       $.getJSON(url, function(res){
         self.set('data', res)
