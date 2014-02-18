@@ -51,11 +51,9 @@ exports.addFilters = function(statement, filters) {
     if(filters.days) {
       var days = filters.days
       var clause = "and datepart(weekday,stopdate) in ("
-      console.log(days, typeof days)
       if(typeof days === 'string') {
         days = days.split(',')
       }
-      console.log(days)
       days.forEach(function(day, idx){
         var parameter = {
           name: 'day' + idx,
@@ -132,7 +130,6 @@ exports.addFilters = function(statement, filters) {
     clauses.push(clause)
   }
   statement = mustache.render(statement, template)
-  console.log(statement)
   return {
     statement: statement,
     parameters: parameters
