@@ -10,10 +10,17 @@
   /*background: #589CDB url(../img/top.jpg) left bottom repeat-x;*/
   color: #fff;
   border-bottom: 5px solid #424242;
+  position: relative;
 }
 
 .header .logo {
   padding: 10px 30px;
+}
+
+.header .version {
+  position: absolute;
+  right: 5px;
+  bottom: 0px;
 }
 
 .dashboard .chart {
