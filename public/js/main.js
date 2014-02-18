@@ -304,13 +304,9 @@ $(document).ready(function(){
       if(res.length) {
         var data = []
         _.each(res, function(row){
-          data.push(_.omit(row, ['ID', 'Long']))
+          data.push(_.omit(row, ['ID', 'Short', 'Long']))
         })
         var columns = _.keys(data[0])
-        var index = columns.indexOf('Short')
-        if(index !== -1){
-          columns[index] = 'Name'
-        }
         table.columns = columns
         _.each(data, function(row){
           table.rows.push({
@@ -327,7 +323,7 @@ $(document).ready(function(){
     setGroupBy: function(e){
       var groupBy = this.model.get('groupBy')
       var value = $('<div />').html($(e.target).html()).text()
-      var key = _.where(this.model.get('data'), {'Short': value})[0]['ID']
+      var key = _.where(this.model.get('data'), {'Name': value})[0]['ID']
       var m = dashboard.filterCollection.where({name: groupBy})
       if(m.length) {
         m[0].set({name: groupBy, value: key, display: value})
