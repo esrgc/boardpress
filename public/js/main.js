@@ -14,7 +14,7 @@ $(document).ready(function(){
     }),
     initialize: function() {
       this.render()
-      this.listenTo(dashboard.filterView.model, 'change', this.update)
+      this.listenTo(dashboard.filterCollection, 'all', this.update)
     },
     render: function() {
       this.$el.html(Mustache.render(this.mapTemplate))
@@ -86,14 +86,13 @@ $(document).ready(function(){
     },
     update: function() {
       var self = this
-      var url = 'getStopsMap'
+      var stopssurl = 'getStopsMap'
       var routesurl = 'getRoutesMap'
-      if(dashboard.filterView) {
-        var querystring = $.param(dashboard.filterView.model.toJSON())
-        url += '?' + querystring
-        routesurl += '?' + querystring
-      }
-      $.getJSON(url, function(res){
+      var querystring = '?' + $.param(dashboard.filterCollection.toJSON())
+      stopssurl += querystring
+      routesurl += querystring
+
+      $.getJSON(stopssurl, function(res){
         self.addStops(res)
       })
 
@@ -115,16 +114,12 @@ $(document).ready(function(){
     },
     initialize: function() {
       this.update()
-      this.listenTo(dashboard.filterView.model, 'change', this.update)
+      this.listenTo(dashboard.filterCollection, 'all', this.update)
     },
     update: function() {
       var self = this
       var url = this.get('api')
-
-      if(dashboard.filterView) {
-        var querystring = $.param(dashboard.filterView.model.toJSON())
-        url += '?' + querystring
-      }
+      url += '?' + $.param(dashboard.filterCollection.toJSON())
       $.getJSON(url, function(res){
         self.set('data', res)
       })
@@ -174,12 +169,12 @@ $(document).ready(function(){
       return res
     },
     download: function(e) {
-      var querystring = $.param(dashboard.filterView.model.toJSON())
+      var querystring = $.param(dashboard.filterCollection.toJSON())
       var url = this.model.get('api') + '?csv=true&' + querystring
       window.open(url)
     },
     code: function(e) {
-      var querystring = $.param(dashboard.filterView.model.toJSON())
+      var querystring = $.param(dashboard.filterCollection.toJSON())
       var url = this.model.get('api') + '?' + querystring
       window.open(url)
     }
@@ -190,13 +185,18 @@ $(document).ready(function(){
       return {
       }
     },
+    initialize: function(){
+      if(!this.get('display')) {
+        this.set('display', this.get('value'))
+      }
+    }
   })
 
   var FilterCollection = Backbone.Collection.extend({
     model: FilterModel
   })
 
-  var FilterView = ChartView.extend({
+  var FilterMenuView = ChartView.extend({
     template: $('#filter-template').html(),
     events: {
       'click button[type="submit"]': 'submitForm',
@@ -204,38 +204,60 @@ $(document).ready(function(){
     },
     initialize: function() {
       this.render()
-      this.listenTo(this.model, 'change', this.update)
+      this.listenTo(dashboard.filterCollection, 'remove', this.render)
+      this.listenTo(dashboard.filterCollection, 'add', this.render)
     },
     render: function() {
-      var attrs = this.model.toJSON()
+      var self = this
+      var attrs = {}
       attrs.title = 'Filters'
       this.$el.html(Mustache.render(this.template, attrs, {
         title: $('#title-partial').html()
       }))
-      this.getAttributes()
+      dashboard.filterCollection.each(function(filter){
+        var inputs = self.$el.find(':input[name="' + filter.get('name') + '"]')
+        var value = filter.get('value')
+        if(inputs.length == 1) {
+          $(inputs).val(value)
+        } else if(inputs.length > 1){
+          inputs.each(function(idx, input){
+            if(value.indexOf(input.value) < 0){
+              input.checked = false
+            }
+          })
+        }
+      })
       return this
-    },
-    update: function() {
-
     },
     clear: function(e) {
       e.preventDefault()
-      this.model.clear()
-      this.render()
+      //this.render()
     },
     getAttributes: function() {
       var self = this
-      var filters = $(this.$el.find('form')).serializeArray()
-      var days = []
-      this.$el.find('input[name="days"]:checked').each(function(i, el){
-        days.push($(el).val())
+      self.$el.find('.filter').each(function(idx, filterel){
+        var inputs = $(filterel).find(':input')
+        if(inputs.length) {
+          var value = $(filterel).find(':checkbox:checked').map(function() {
+            return this.value
+          }).get().join(',')
+          if(!value) {
+            value = $(inputs).val()
+          }
+          var name = $(inputs).get(0).name
+            , filters = dashboard.filterCollection.where({'name': name})
+            , filter = false
+          if(filters.length){
+            filters[0].set('value', value)
+            filters[0].set('display', value)
+          } else {
+            dashboard.filterCollection.add({
+              name: name,
+              value: value
+            })
+          }
+        }
       })
-      var newModelAttributes = []
-      _.each(filters, function(filter){
-        newModelAttributes[filter.name] = filter.value
-      })
-      newModelAttributes.days = days
-      self.model.set(newModelAttributes)
     },
     submitForm: function(e){
       e.preventDefault()
@@ -304,10 +326,14 @@ $(document).ready(function(){
       var groupBy = this.model.get('groupBy')
       var value = $('<div />').html($(e.target).html()).text()
       var key = _.where(this.model.get('data'), {'Short': value})[0]['ID']
-      dashboard.filterView.model.set(groupBy, key)
-      dashboard.chartCollection.each(function(chart){
-        chart.update()
-      })
+      var m = dashboard.filterCollection.where({name: groupBy})
+      if(m.length) {
+        m[0].set({name: groupBy, value: key, display: value})
+      } else {
+        dashboard.filterCollection.add([
+          {name: groupBy, value: key, display: value}
+        ])
+      }
     }
   })
 
@@ -367,35 +393,46 @@ $(document).ready(function(){
     }
   })
 
-  var SummaryView = Backbone.View.extend({
-    template: $('#summary-template').html(),
+  var FilterLabelView = Backbone.View.extend({
+    template: $('#filter-label-template').html(),
+    tagName: 'div',
+    className: 'filter-label',
     events: {
       'click .remove': 'removeFilter'
     },
     initialize: function() {
-      this.render()
       this.listenTo(this.model, 'change', this.render)
+      this.listenTo(this.model, 'destroy', this.remove)
     },
     render: function() {
-      var tmp = {
-        filters: []
-      }
-      var data = this.model.toJSON()
-      var keys = _.keys(data)
-      _.each(keys, function(key){
-        tmp.filters.push({
-          name: key,
-          value: data[key]
-        })
-      })
-      this.$el.html(Mustache.render(this.template, tmp))
-      if(keys.length === 0) {
-        this.$el.find('.chart').html('All')
-      }
+      this.$el.html(Mustache.render(this.template, this.model.toJSON()))
       return this
     },
-    removeFilter: function(e) {
-      console.log(e)
+    removeFilter: function(){
+      this.model.destroy()
+    }
+  })
+
+  var SummaryView = Backbone.View.extend({
+    template: $('#summary-template').html(),
+    events: {
+
+    },
+    initialize: function() {
+      this.render()
+      this.listenTo(dashboard.filterCollection, 'add', this.addOne)
+    },
+    addOne: function(filter) {
+      var view = new FilterLabelView({model: filter});
+      this.$(".filter-labels").append(view.render().el);
+    },
+    addAll: function() {
+      dashboard.filterCollection.each(this.addOne, this);
+    },
+    render: function() {
+      this.$el.html(Mustache.render(this.template))
+      this.addAll()
+      return this
     }
   })
 
@@ -411,9 +448,8 @@ $(document).ready(function(){
         {name: "days", value: ['1', '2', '3', '4', '5', '6', '7']},
         {name: "passType", value: 'All'}
       ])
-      this.filterModel = new FilterModel()
-      this.filterView = new FilterView({el: '.block1', model: this.filterModel})
-      this.summaryView = new SummaryView({el: '.block9', model: this.filterModel})
+      this.filterMenuView = new FilterMenuView({el: '.block1'})
+      this.summaryView = new SummaryView({el: '.block9'})
       this.mapView = new MapView({el: '.block3'})
       this.chartCollection = new ChartCollection()
       this.chartCollection.add([

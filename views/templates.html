@@ -33,12 +33,14 @@
   </div>
 </script>
 
+<script type="text/template" id="filter-label-template">
+  <span class="label label-primary">{{name}}: {{display}} <i class="fa fa-times remove"></i></span>
+</script>
+
 <script type="text/template" id="summary-template">
   <div class="chart summary">
     <strong>Active Filters:</strong>
-    {{#filters}}
-      <span class="label label-primary">{{name}}: {{value}} <i class="fa fa-times remove"></i></span>
-    {{/filters}}
+    <div class="filter-labels"></div>
   </div>
 </script>
 
@@ -54,51 +56,59 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">Start</label>
           <div class="col-sm-10">
-            <input type="date" class="form-control" name="startDate" value="1970-01-01">
+            <div class="filter">
+              <input type="date" class="form-control" name="startDate" value="1970-01-01">
+            </div>
           </div>
         </div>
         <div class="form-group">
           <label class="col-sm-2 control-label">End</label>
           <div class="col-sm-10">
-            <input type="date" class="form-control" name="endDate" value="2015-01-01">
+            <div class="filter">
+              <input type="date" class="form-control" name="endDate" value="2015-01-01">
+            </div>
           </div>
         </div>
         <div class="form-group">
           <label class="col-sm-2 control-label">Days</label>
           <div class="col-sm-10">
-            <label class="checkbox-inline">
-              <input type="checkbox" name="days" value="1" checked> S
-            </label>
-            <label class="checkbox-inline">
-              <input type="checkbox" name="days" value="2" checked> M
-            </label>
-            <label class="checkbox-inline">
-              <input type="checkbox" name="days" value="3" checked> T
-            </label>
-            <label class="checkbox-inline">
-              <input type="checkbox" name="days" value="4" checked> W
-            </label>
-            <label class="checkbox-inline">
-              <input type="checkbox" name="days" value="5" checked> Th
-            </label>
-            <label class="checkbox-inline">
-              <input type="checkbox" name="days" value="6" checked> F
-            </label>
-            <label class="checkbox-inline">
-              <input type="checkbox" name="days" value="7" checked> S
-            </label>
+            <div class="filter">
+              <label class="checkbox-inline">
+                <input type="checkbox" name="days" value="1" checked> S
+              </label>
+              <label class="checkbox-inline">
+                <input type="checkbox" name="days" value="2" checked> M
+              </label>
+              <label class="checkbox-inline">
+                <input type="checkbox" name="days" value="3" checked> T
+              </label>
+              <label class="checkbox-inline">
+                <input type="checkbox" name="days" value="4" checked> W
+              </label>
+              <label class="checkbox-inline">
+                <input type="checkbox" name="days" value="5" checked> Th
+              </label>
+              <label class="checkbox-inline">
+                <input type="checkbox" name="days" value="6" checked> F
+              </label>
+              <label class="checkbox-inline">
+                <input type="checkbox" name="days" value="7" checked> S
+              </label>
+            </div>
           </div>
         </div>
         <div class="form-group">
           <label for="inputPassword" class="col-sm-2 control-label">Rider</label>
           <div class="col-sm-10">
-            <select class="form-control" name="passType">
-              <option>All</option>
-              <option>Child</option>
-              <option>Dis</option>
-              <option>RF</option>
-              <option>Vet</option>
-            </select>
+            <div class="filter">
+              <select class="form-control" name="passType">
+                <option>All</option>
+                <option>Child</option>
+                <option>Dis</option>
+                <option>RF</option>
+                <option>Vet</option>
+              </select>
+            </div>
           </div>
         </div>
         <div class="form-group">
