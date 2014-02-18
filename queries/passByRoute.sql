@@ -12,6 +12,7 @@ on a.route_refid = c.route_refid
 where b.passType_refid is not null
 {{{dateRangeFilter}}}
 {{{dayFilter}}}
+{{{passFilter}}}
 {{{routeFilter}}}
 {{{shiftFilter}}}
 {{{tripFilter}}}
