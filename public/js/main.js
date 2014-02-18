@@ -114,7 +114,9 @@ $(document).ready(function(){
     },
     initialize: function() {
       this.update()
-      this.listenTo(dashboard.filterCollection, 'all', this.update)
+      this.listenTo(dashboard.filterCollection, 'change', this.update)
+      this.listenTo(dashboard.filterCollection, 'add', this.update)
+      this.listenTo(dashboard.filterCollection, 'remove', this.update)
     },
     update: function() {
       var self = this
@@ -348,6 +350,7 @@ $(document).ready(function(){
         toolbar: $('#toolbar-partial').html()
       }))
       this.drawChart()
+      this.$el.find('.chart-inner').css('overflow', 'hidden')
       return this
     },
     drawChart: function() {
@@ -373,6 +376,7 @@ $(document).ready(function(){
         , y: ['111a', '111r']
         , colors: ["#a6cee3","#1f78b4","#b2df8a","#33a02c","#fb9a99","#e31a1c","#fdbf6f","#ff7f00","#cab2d6","#6a3d9a","#ffff99","#b15928"]
         , legend: true
+        , legendWidth: 50
         , interpolate: 'none'
         , xTickFormat: d3.time.format('%m/%d')
         , yTicksCount: 5
