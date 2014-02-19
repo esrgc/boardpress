@@ -11,7 +11,11 @@
     <link rel="stylesheet" type="text/css" href="lib/leaflet/leaflet.css">
     <link rel="stylesheet" type="text/css" href="lib/geodash/geodash.min.css">
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <% if(env == 'production') { %>
+    <link rel="stylesheet" type="text/css" href="css/style.min.css?v=<%= version %>">
+    <% } else if(env == 'development'){ %>
+    <link rel="stylesheet" type="text/css" href="css/style.css?v=<%= version %>">
+    <% } %>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -24,7 +28,5 @@
   <div class="logo">
     <img src="./img/logo_270px.png">
   </div>
-  <div class="version">
-  v0.0.1
-  </div>
+  <div class="version">v<%= version %></div>
 </div>

@@ -1,6 +1,6 @@
 {
   "name": "shoretransit",
-  "version": "0.0.0",
+  "version": "0.0.31",
   "description": "shoretransit ============",
   "main": "app.js",
   "scripts": {
@@ -22,5 +22,13 @@
     "json2csv": "~2.2.1",
     "underscore": "~1.6.0",
     "mustache": "~0.8.1"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-uglify": "~0.3.2",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-bump": "0.0.13",
+    "grunt-contrib-cssmin": "~0.8.0",
+    "assemble": "~0.4.35"
   }
 }

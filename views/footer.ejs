@@ -5,6 +5,10 @@
 <script src="lib/underscore-min.js"></script>
 <script src="lib/backbone-min.js"></script>
 <script src="lib/geodash/geodash.min.js"></script>
-<script src="js/main.js"></script>
+<% if(env == 'production') { %>
+<script src="js/min/<%= name %>.min.js?v=<%= version %>"></script>
+<% } else if(env == 'development'){ %>
+<script src="js/main.js?v=<%= version %>"></script>
+<% } %>
 </body>
 </html>

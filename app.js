@@ -3,6 +3,9 @@
  *   Shore Transit Dashboard
  */
 
+//set up configuration
+var configs = require('./config/config.js')
+
 var express = require('express')
   , routes = require('./routes')
   , http = require('http')
