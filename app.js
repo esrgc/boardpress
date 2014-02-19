@@ -11,12 +11,11 @@ var express = require('express')
   , http = require('http')
   , path = require('path')
   , api = require('./routes/api')
-  , db = require('./db')
 
 var app = express()
 
 app.configure(function(){
-  app.set('port', process.env.PORT || 3006)
+  app.set('port', process.env.PORT || 3000)
   app.set('views', __dirname + '/views')
   app.set('view engine', 'ejs')
   app.use(express.logger('dev'))
@@ -31,18 +30,10 @@ app.configure('development', function(){
 })
 
 app.get('/', routes.index)
-app.get('/getRoutes', api.getRoutes)
-app.get('/getStops', api.getStops)
-app.get('/getStopsMap', api.getStopsMap)
-app.get('/getRoutesMap', api.getRoutesMap)
-app.get('/getShifts', api.getShifts)
-app.get('/getTrips', api.getTrips)
-app.get('/getPassengersByRoute', api.getPassengersByRoute)
-app.get('/getPassengersByTrip', api.getPassengersByTrip)
-app.get('/getPassengersByStop', api.getPassengersByStop)
-app.get('/getPassengersByShift', api.getPassengersByShift)
-app.get('/getPassengersByGrant', api.getPassengersByGrant)
-app.get('/getFares', api.getFares)
+app.get('/getBarData', api.getBarData)
+app.get('/getTableData', api.getTableData)
+app.get('/getLineData', api.getLineData)
+app.get('/getPieData', api.getPieData)
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'))

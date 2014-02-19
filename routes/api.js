@@ -1,8 +1,10 @@
-var db = require('../db')
-  , json2csv = require('json2csv')
+var json2csv = require('json2csv')
   , fs = require('fs')
   , _ = require('underscore')
   , path = require('path')
+
+
+//var db = require('../db')
 
 function returnData(req, res, data) {
   if(req.query.csv) {
@@ -21,89 +23,107 @@ function returnData(req, res, data) {
   }
 }
 
-exports.getRoutes = function(req, res){
-  var statement = 'select route_refid as id, route_shortname as name, route_color as color, route_estmileage as mileage from routes'
-  db.executeStatement(statement, req.query, function(data) {
-    returnData(req, res, data)
-  })
+exports.getBarData = function(req, res){
+  var data = [
+    {
+      "Name": "Grant 5307",
+      "On": 828,
+      "Off": 1079
+    },
+    {
+      "Name": "Grant 5311",
+      "On": 289,
+      "Off": 395
+    },
+    {
+      "Name": "Grant DHR",
+      "On": 1806,
+      "Off": 3205
+    }
+  ]
+  returnData(req, res, data)
 }
 
-exports.getStops = function(req, res){
-  var statement = 'select stop_refid as id, stop_name as name, stop_status as status from stops'
-  db.executeStatement(statement, req.query, function(data) {
-    returnData(req, res, data)
-  })
+exports.getTableData = function(req, res){
+  var data = [
+    {
+      "ID": "111a",
+      "Name": "111a",
+      "Short": "111 South: Sby-PA-UMES",
+      "Long": "111 South: Salisbury-Princess Anne-UMES",
+      "CHILD": 13,
+      "DIS": 11,
+      "On": 358,
+      "Off": 463
+    },
+    {
+      "ID": "111r",
+      "Name": "111r",
+      "Short": "111 North: Sby-Delmar",
+      "Long": "111 North: Salisbury - Delmar",
+      "CHILD": 10,
+      "DIS": 32,
+      "On": 269,
+      "Off": 373
+    },
+    {
+      "ID": "190a",
+      "Name": "190a",
+      "Short": "190 NW & S Salisbury",
+      "Long": "190 - Northwest & South Salisbury",
+      "CHILD": 0,
+      "DIS": 13,
+      "On": 41,
+      "Off": 51
+    }
+  ]
+  returnData(req, res, data)
 }
 
-exports.getStopsMap = function(req, res){
-  db.sqlFileToJson('getStopsMap.sql', req.query, function(data){
-    returnData(req, res, data)
-  })
+exports.getLineData = function(req, res){
+  var data = [
+    {
+      'date': '2013-06-01',
+      'numCats':92817,
+      'goalCats': 100000
+    },
+    {
+      'date': '2013-06-02',
+      'numCats':82705,
+      'goalCats': 100000
+    },
+    {
+      'date': '2013-06-03',
+      'numCats':75920,
+      'goalCats': 100000
+    }
+  ]
+  returnData(req, res, data)
 }
 
+exports.getPieData = function(req, res){
+  var data = [
+    {
+      'id':'lol',
+      'value':33
+    },
+    {
+      'id':'cats',
+      'value':11
+    },
+    {
+      'id':'cool',
+      'value':2
+    }
+  ]
+  returnData(req, res, data)
+}
+
+//Example
+/*
 exports.getRoutesMap = function(req, res){
   db.sqlFileToJson('getRoutesMap.sql', req.query, function(data){
     returnData(req, res, data)
   })
 }
-
-exports.getShifts = function(req, res){
-  var statement = 'select shift_refid as id, shift_name as name, shift_startdeparttime as depart, shift_endarrivaltime as arrival from shifts'
-  db.executeStatement(statement, req.query, function(data) {
-    returnData(req, res, data)
-  })
-}
-
-exports.getTrips = function(req, res){
-  var statement = 'select trip_refid as id, trip_startdeparttime as depart, trip_endarrivaltime as arrival from trips where tripinservice_id = 1'
-  db.executeStatement(statement, req.query, function(data) {
-    returnData(req, res, data)
-  })
-}
-
-exports.getPassengersByGrant = function(req, res){
-  db.sqlFileToJson('passByGrant.sql', req.query, function(data){
-    returnData(req, res, data)
-  })
-}
-
-exports.getPassengersByRoute = function(req, res){
-  db.sqlFileToJson('passByRoute.sql', req.query, function(data){
-    returnData(req, res, data)
-  })
-}
-
-exports.getPassengersByTrip = function(req, res){
-  db.sqlFileToJson('passByTrip.sql', req.query, function(data){
-    returnData(req, res, data)
-  })
-}
-
-exports.getPassengersByStop = function(req, res){
-  db.sqlFileToJson('passByStop.sql', req.query, function(data){
-    returnData(req, res, data)
-  })
-}
-
-exports.getPassengersByShift = function(req, res){
-  db.sqlFileToJson('passByShift.sql', req.query, function(data){
-    returnData(req, res, data)
-  })
-}
-
-exports.getFares = function(req, res){
-  db.sqlFileToJson('fareByShift.sql', req.query, function(data){
-    var newdata = []
-    var dates = _.uniq(_.pluck(data, "Date"))
-    dates.forEach(function(date){
-      var rows = _.where(data, {"Date": date})
-      var obj = {"Date": date}
-      rows.forEach(function(row){
-        obj[row.variable] = row.Fare
-      })
-      newdata.push(obj)
-    })
-    newdata = _.sortBy(newdata, function(obj){ return new Date(obj.Date) })
-    returnData(req, res, newdata)
-  })
-}
+*/

@@ -1,112 +1,38 @@
 $(document).ready(function(){
 
-  var routeColors = ["#a6cee3","#1f78b4","#b2df8a","#33a02c","#fdbf6f",
-    "#ff7f00","#cab2d6","#6a3d9a","#ffff99","#b15928","#a6cee3","#1f78b4",
-    "#b2df8a","#33a02c","#fdbf6f","#ff7f00"]
 
   var MapView = Backbone.View.extend({
     mapTemplate: $('#map-template').html(),
-    busIcon: L.icon({
-      iconUrl: 'img/bus-18.png',
-      iconRetinaUrl: 'img/bus-18@2x.png',
-      iconSize: [18, 18],
-      popupAnchor: [1, -5]
-    }),
     initialize: function() {
       this.render()
       this.listenTo(dashboard.filterCollection, 'all', this.update)
     },
     render: function() {
-      this.$el.html(Mustache.render(this.mapTemplate))
+      var attrs = {
+        title: 'Map'
+      }
+      this.$el.html(Mustache.render(this.mapTemplate, attrs, {
+        title: $('#title-partial').html()
+      }))
       this.makeMap()
       return this
     },
     makeMap: function() {
       var self = this
-      var mapdiv = this.$el.find('.map')[0]
+      var mapdiv = this.$el.find('.chart-inner')[0]
       this.map = L.map(mapdiv).setView([38.25, -75.5], 10)
-
       L.tileLayer('http://{s}.tiles.mapbox.com/v3/esrgc.map-y9awf40v/{z}/{x}/{y}.png')
         .addTo(this.map)
-
-      this.stopLayer = new L.featureGroup()
-      this.map.addLayer(this.stopLayer)
-
-      this.routesLayer = new L.geoJson()
-
-      $.get('data/stroutes.json', function(res){
-        self.routesGeoJSON = res
-        self.update()
-      })
-    },
-    addStops: function(stops) {
-      var self = this
-      this.stopLayer.clearLayers()
-      _.each(stops, function(stop){
-        var m = L.marker([stop.lat, stop.lng], {icon: self.busIcon})
-          .bindPopup('<b>Stop</b><br>' + stop.id + '<br>' + stop.name)
-        self.stopLayer.addLayer(m)
-      })
-      if(stops.length > 1) {
-        var bounds = self.stopLayer.getBounds()
-        self.map.fitBounds(bounds)
-      } else if(stops.length == 1) {
-        self.map.setView([stops[0].lat, stops[0].lng], 14)
-      }
-
-    },
-    addRoutes: function(routes) {
-      var self = this
-      var idx = 0
-      , myStyle = {
-        "color": "#F06730",
-        "weight": 3,
-        "opacity": 1
-      }
-      , onEachFeature = function(feature, layer) {
-        if (feature.properties && feature.properties.Name) {
-          layer.bindPopup('<b>Route</b><br>' + feature.properties.route_refi + '<br>' + feature.properties.Name)
-        }
-        if(routeColors[idx]) myStyle.color = routeColors[idx]
-        layer.setStyle(myStyle)
-        idx = idx + 1
-      },
-      filter = function(feature, layer){
-        if(self.routesToShow.indexOf(feature.properties.route_refi) >= 0) {
-          return true
-        } else {
-          return false
-        }
-      }
-      this.routesLayer.clearLayers()
-      this.routesLayer = L.geoJson(routes, {
-          onEachFeature: onEachFeature,
-          filter: filter
-      }).addTo(this.map)
     },
     update: function() {
-      var self = this
-      var stopssurl = 'getStopsMap'
-      var routesurl = 'getRoutesMap'
-      var querystring = '?' + $.param(dashboard.filterCollection.toJSON())
-      stopssurl += querystring
-      routesurl += querystring
 
-      $.getJSON(stopssurl, function(res){
-        self.addStops(res)
-      })
-
-      $.getJSON(routesurl, function(res){
-        self.routesToShow = _.pluck(res, 'id')
-        self.addRoutes(self.routesGeoJSON)
-      })
     }
   })
 
   var ChartModel = Backbone.Model.extend({
     defaults: function() {
       return {
-        api: '/getRoutes',
+        api: '',
         title: 'Chart Title',
         sort_key: false,
         sort_desc: true
@@ -198,75 +124,6 @@ $(document).ready(function(){
     model: FilterModel
   })
 
-  var FilterMenuView = ChartView.extend({
-    template: $('#filter-template').html(),
-    events: {
-      'click button[type="submit"]': 'submitForm',
-      'click button.clear': 'clear'
-    },
-    initialize: function() {
-      this.render()
-      this.listenTo(dashboard.filterCollection, 'remove', this.render)
-      this.listenTo(dashboard.filterCollection, 'add', this.render)
-    },
-    render: function() {
-      var self = this
-      var attrs = {}
-      attrs.title = 'Filters'
-      this.$el.html(Mustache.render(this.template, attrs, {
-        title: $('#title-partial').html()
-      }))
-      dashboard.filterCollection.each(function(filter){
-        var inputs = self.$el.find(':input[name="' + filter.get('name') + '"]')
-        var value = filter.get('value')
-        if(inputs.length == 1) {
-          $(inputs).val(value)
-        } else if(inputs.length > 1){
-          inputs.each(function(idx, input){
-            if(value.indexOf(input.value) < 0){
-              input.checked = false
-            }
-          })
-        }
-      })
-      return this
-    },
-    clear: function(e) {
-      e.preventDefault()
-      //this.render()
-    },
-    getAttributes: function() {
-      var self = this
-      self.$el.find('.filter').each(function(idx, filterel){
-        var inputs = $(filterel).find(':input')
-        if(inputs.length) {
-          var value = $(filterel).find(':checkbox:checked').map(function() {
-            return this.value
-          }).get().join(',')
-          if(!value) {
-            value = $(inputs).val()
-          }
-          var name = $(inputs).get(0).name
-            , filters = dashboard.filterCollection.where({'name': name})
-            , filter = false
-          if(filters.length){
-            filters[0].set('value', value)
-            filters[0].set('display', value)
-          } else {
-            dashboard.filterCollection.add({
-              name: name,
-              value: value
-            })
-          }
-        }
-      })
-    },
-    submitForm: function(e){
-      e.preventDefault()
-      this.getAttributes()
-    }
-  })
-
   var TableView = ChartView.extend({
     template: $('#table-template').html(),
     events: function(){
@@ -302,10 +159,7 @@ $(document).ready(function(){
         columns: []
       }
       if(res.length) {
-        var data = []
-        _.each(res, function(row){
-          data.push(_.omit(row, ['ID', 'Short', 'Long']))
-        })
+        var data = res
         var columns = _.keys(data[0])
         table.columns = columns
         _.each(data, function(row){
@@ -354,9 +208,10 @@ $(document).ready(function(){
       this.chart = new GeoDash.BarChartHorizontal(chartel, {
         y: 'Name'
         , x: ['On', 'Off']
-        , colors: ['#F06730', '#66A7E1']
+        , colors: ['#D1E751', '#26ADE4']
         , xTickFormat: d3.format(".2s")
         , yWidth: 60
+        , opacity: 1
       })
     },
     update: function() {
@@ -368,30 +223,35 @@ $(document).ready(function(){
     drawChart: function() {
       var chartel = this.$el.find('.chart-inner').selector
       this.chart = new GeoDash.LineChart(chartel, {
-        x: 'Date'
-        , y: ['111a', '111r']
-        , colors: ["#a6cee3","#1f78b4","#b2df8a","#33a02c","#fb9a99","#e31a1c","#fdbf6f","#ff7f00","#cab2d6","#6a3d9a","#ffff99","#b15928"]
+        x: 'date'
+        , y: ['numCats', 'goalCats']
+        , colors: ['#D1E751', '#26ADE4']
         , legend: true
         , legendWidth: 50
-        , money: true
-        , hoverTemplate: "{{x}}: ${{y}}"
+        , hoverTemplate: "{{x}}: {{y}}"
         , interpolate: 'none'
         , xTickFormat: d3.time.format('%m/%d')
         , yTicksCount: 5
       })
     },
     prepData: function(res) {
-      var lines = []
-      _.each(res, function(el){
-        lines.push(_.keys(_.omit(el, "Date")))
-      })
-      lines = _.uniq(_.flatten(lines))
-      this.chart.options.y = lines
       var parseDate = d3.time.format('%Y-%m-%d').parse
       _.each(res, function(obj, idx){
-        obj.Date = parseDate(obj.Date)
+        obj.date = parseDate(obj.date)
       })
       return res
+    }
+  })
+
+  var PieChartView = BarChartView.extend({
+    drawChart: function() {
+      var chartel = this.$el.find('.chart-inner').selector
+      this.chart = new GeoDash.PieChart(chartel, {
+        label: 'id'
+        , value: 'value'
+        , colors: ['#D1E751', '#26ADE4', "#333"]
+        , opacity: 1
+      })
     }
   })
 
@@ -445,46 +305,36 @@ $(document).ready(function(){
     render: function(){
       this.filterCollection = new FilterCollection()
       this.filterCollection.add([
-        {name: "startDate", value: '1970-01-01'},
-        {name: "endDate", value: '2015-01-01'},
-        {name: "days", value: ['1', '2', '3', '4', '5', '6', '7']},
-        {name: "passType", value: 'All'}
+
       ])
-      this.filterMenuView = new FilterMenuView({el: '.block1'})
-      this.summaryView = new SummaryView({el: '.block9'})
-      this.mapView = new MapView({el: '.block3'})
+      this.mapView = new MapView({el: '.block0'})
       this.chartCollection = new ChartCollection()
       this.chartCollection.add([
-        {title: "Ridership By Route", api: 'getPassengersByRoute', groupBy: 'route'},
-        {title: "Ridership By Shift", api: 'getPassengersByShift', groupBy: 'shift'},
-        {title: "Ridership By Trip", api: 'getPassengersByTrip', groupBy: 'trip'},
-        {title: "Ridership By Stop", api: 'getPassengersByStop', groupBy: 'stop'},
-        {title: "Ridership By Grant", api: 'getPassengersByGrant'},
-        {title: "Revenue", api: 'getFares'}
+        {title: "Test Chart 1", api: 'getBarData'},
+        {title: "Test Chart 2", api: 'getTableData'},
+        {title: "Test Chart 3", api: 'getLineData'},
+        {title: "Test Chart 4", api: 'getPieData'},
+        {title: "Test Chart 5", api: 'getTableData'}
       ])
-      new TableView({
-        model: this.chartCollection.at(0),
-        el: '.block2'
-      })
       new BarChartView({
-        model: this.chartCollection.at(4),
-        el: '.block4'
+        model: this.chartCollection.at(0),
+        el: '.block1'
       })
       new TableView({
         model: this.chartCollection.at(1),
-        el: '.block5'
-      })
-      new TableView({
-        model: this.chartCollection.at(2),
-        el: '.block6'
+        el: '.block2'
       })
       new LineChartView({
-        model: this.chartCollection.at(5),
-        el: '.block7'
+        model: this.chartCollection.at(2),
+        el: '.block3'
+      })
+      new PieChartView({
+        model: this.chartCollection.at(3),
+        el: '.block4'
       })
       new TableView({
-        model: this.chartCollection.at(3),
-        el: '.block8'
+        model: this.chartCollection.at(4),
+        el: '.block5'
       })
     }
   })
