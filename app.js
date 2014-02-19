@@ -31,6 +31,7 @@ app.configure('development', function(){
 
 app.get('/', routes.index)
 app.get('/getBarData', api.getBarData)
+app.get('/getBarData2', api.getBarData2)
 app.get('/getTableData', api.getTableData)
 app.get('/getLineData', api.getLineData)
 app.get('/getPieData', api.getPieData)

@@ -44,6 +44,55 @@ exports.getBarData = function(req, res){
   returnData(req, res, data)
 }
 
+exports.getBarData2 = function(req, res){
+  var data = [
+    {
+      'id': 'Mon',
+      '2011': '42235.7',
+      '2012': '42235.7',
+      '2013': '42235.7'
+    },
+    {
+      'id': 'Tuesday Lol',
+      '2011': '165113.8',
+      '2012': '42235.7',
+      '2013': '42235.7'
+    },
+    {
+      'id': 'Wed',
+      'geocode': '45',
+      '2011': '64447.3',
+      '2012': '42235.7',
+      '2013': '42235.7'
+    },
+    {
+      'id': 'Thu',
+      '2011': '12444.0',
+      '2012': '42235.7',
+      '2013': '42235.7'
+    },
+    {
+      'id': 'Fri',
+      '2011': '22444.0',
+      '2012': '42235.7',
+      '2013': '42235.7'
+    },
+    {
+      'id': 'Sat',
+      '2011': '62444.0',
+      '2012': '42235.7',
+      '2013': '42235.7'
+    },
+    {
+      'id': 'Sun',
+      '2011': '92444.0',
+      '2012': '42235.7',
+      '2013': '42235.7'
+    }
+  ]
+  returnData(req, res, data)
+}
+
 exports.getTableData = function(req, res){
   var data = [
     {
@@ -110,10 +159,6 @@ exports.getPieData = function(req, res){
     {
       'id':'cats',
       'value':11
-    },
-    {
-      'id':'cool',
-      'value':2
     }
   ]
   returnData(req, res, data)

@@ -205,6 +205,23 @@ $(document).ready(function(){
     },
     drawChart: function() {
       var chartel = this.$el.find('.chart-inner').selector
+      this.chart = new GeoDash.BarChartVertical(chartel, {
+        x: 'id'
+        , y: ['2011', '2013']
+        , colors: ['#D1E751', '#26ADE4', "#333"]
+        , title: 'Vertical Bar Chart'
+        , yTickFormat: d3.format(".2s")
+        , opacity: 1
+      })
+    },
+    update: function() {
+      this.chart.update(this.prepData(this.model.get('data')))
+    }
+  })
+
+  var HorizontalBarChartView = BarChartView.extend({
+    drawChart: function() {
+      var chartel = this.$el.find('.chart-inner').selector
       this.chart = new GeoDash.BarChartHorizontal(chartel, {
         y: 'Name'
         , x: ['On', 'Off']
@@ -213,9 +230,6 @@ $(document).ready(function(){
         , yWidth: 60
         , opacity: 1
       })
-    },
-    update: function() {
-      this.chart.update(this.prepData(this.model.get('data')))
     }
   })
 
@@ -310,11 +324,11 @@ $(document).ready(function(){
       this.mapView = new MapView({el: '.block0'})
       this.chartCollection = new ChartCollection()
       this.chartCollection.add([
-        {title: "Test Chart 1", api: 'getBarData'},
+        {title: "Test Chart 1", api: 'getBarData2'},
         {title: "Test Chart 2", api: 'getTableData'},
         {title: "Test Chart 3", api: 'getLineData'},
         {title: "Test Chart 4", api: 'getPieData'},
-        {title: "Test Chart 5", api: 'getTableData'}
+        {title: "Test Chart 5", api: 'getBarData'}
       ])
       new BarChartView({
         model: this.chartCollection.at(0),
@@ -332,7 +346,7 @@ $(document).ready(function(){
         model: this.chartCollection.at(3),
         el: '.block4'
       })
-      new TableView({
+      new HorizontalBarChartView({
         model: this.chartCollection.at(4),
         el: '.block5'
       })
