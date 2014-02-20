@@ -1,15 +1,23 @@
 Boardpress
 ============
 
-Dashboard Template
+Node.js + Backbone.js Dashboard templates
 
 ![Image](boardpress.png?raw=true)
 
-Backend
-* Node
-* Express
+Server side dependencies
+* express
+* ejs
+* tedious
+* json2csv
+* underscore
+* mustache
 
-Frontend
-* Bootstrap
-* Leaflet
-* GeoDash
+Client side dependencies
+* jquery
+* bootstrap
+* leaflet
+* mustache
+* underscore
+* backbone
+* geodash
