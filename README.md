@@ -13,3 +13,4 @@ Frontend
 * Bootstrap
 * Leaflet
 * GeoDash
+* Browserify

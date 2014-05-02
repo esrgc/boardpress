@@ -12,13 +12,14 @@ module.exports = function(grunt) {
         push: false
       }
     },
-    cssmin: {
-      minify: {
-        expand: true,
-        cwd: 'public/css/',
-        src: ['*.css', '!*.min.css'],
-        dest: 'public/css/',
-        ext: '.min.css'
+    less: {
+      options: {
+        compress: true
+      },
+      dist: {
+        files: {
+          'public/css/<%= pkg.name %>.css': ['public/css/style.less']
+        }
       }
     },
     concat: {
@@ -30,6 +31,22 @@ module.exports = function(grunt) {
         dest: 'public/js/min/<%= pkg.name %>.js'
       }
     },
+    browserify: {
+      options: {
+        bundleOptions: { debug: true }
+      },
+      dev: {
+        src: 'public/js/index.js',
+        dest: 'public/js/min/<%= pkg.name %>.js'
+      },
+      deploy: {
+        options: {
+          bundleOptions: { debug: false }
+        },
+        src: 'public/js/index.js',
+        dest: 'public/js/min/<%= pkg.name %>.min.js'
+      }
+    },
     uglify: {
       options: {
         banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
@@ -38,15 +55,28 @@ module.exports = function(grunt) {
         src: 'public/js/min/<%= pkg.name %>.js',
         dest: 'public/js/min/<%= pkg.name %>.min.js'
       }
+    },
+    watch: {
+      browserify: {
+        files: ['public/js/*.js'],
+        tasks: ['bump', 'browserify:dev']
+      },
+      css: {
+        files: 'public/css/*.less',
+        tasks: ['bump', 'less']
+      }
     }
   });
 
   grunt.loadNpmTasks('grunt-bump');
   grunt.loadNpmTasks('assemble');
-  grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-browserify');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
-  grunt.registerTask('default', ['bump', 'cssmin', 'concat', 'uglify']);
+  grunt.registerTask('default', ['bump', 'less', 'browserify:dev', 'watch']);
+  grunt.registerTask('deploy', ['bump', 'less', 'browserify:deploy']);
 
 };

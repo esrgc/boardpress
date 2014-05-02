@@ -2,10 +2,10 @@
 process.env.NODE_ENV = 'development';
 
 //set server port
-process.env.PORT = 3007
+process.env.PORT = 3010
 
 //MSSQL connection
-exports.db = {
+exports.mssql = {
   userName: ''
   , password: ''
   , server: ''

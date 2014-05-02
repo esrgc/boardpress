@@ -1,0 +1,43 @@
+@import 'variables.less';
+
+.dashboard {
+  .chart {
+    .table {
+      background: #fff;
+      margin-bottom: 0px;
+      color: #333;
+      thead tr th {
+        border-bottom: 0px solid @tableBorder;
+      }
+
+      td, th {
+        border-left: 1px solid @tableBorder;
+        border-right: 1px solid @tableBorder;
+        border-bottom: 1px solid @tableBorder;
+        &:first-child {
+          border-left: 0px solid @tableBorder;
+        }
+      }
+
+      th:hover {
+        cursor: pointer;
+      }
+
+      td {
+        text-align: right;
+        &.grouper {
+          text-align: left;
+         a {
+            color: #000;
+            text-decoration: underline;
+            text-align: left;
+          }
+        }
+        .name {
+          text-align: left;
+        }
+      }
+
+    }
+  }
+}

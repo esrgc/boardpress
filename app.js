@@ -1,41 +1,34 @@
 
 /**
- *   Shore Transit Dashboard
+ *   Boardpress
+ *   Author: Frank Rowe, ESRGC
+ *   Date: April, 2014
  */
 
-//set up configuration
-var configs = require('./config/config.js')
-
 var express = require('express')
-  , routes = require('./routes')
+  , errorhandler = require('errorhandler')
+  , bodyParser = require('body-parser')
+  , morgan = require('morgan')
   , http = require('http')
+  , cors = require('cors')
   , path = require('path')
-  , api = require('./routes/api')
+  , config = require('./config/config')
 
 var app = express()
 
-app.configure(function(){
-  app.set('port', process.env.PORT || 3000)
-  app.set('views', __dirname + '/views')
-  app.set('view engine', 'ejs')
-  app.use(express.logger('dev'))
-  app.use(express.bodyParser())
-  app.use(express.methodOverride())
-  app.use(app.router)
-  app.use(express.static(path.join(__dirname, 'public')))
-})
+app.set('port', process.env.PORT || 3000)
+app.set('views', __dirname + '/views')
+app.set('view engine', 'ejs')
+app.use(cors())
+app.use(bodyParser())
+app.use(express.static(path.join(__dirname, 'public')))
 
-app.configure('development', function(){
-  app.use(express.errorHandler())
-})
+var env = process.env.NODE_ENV || 'development';
+if ('development' == env) {
+   app.use(errorhandler())
+}
 
-app.get('/', routes.index)
-app.get('/getBarData', api.getBarData)
-app.get('/getBarData2', api.getBarData2)
-app.get('/getTableData', api.getTableData)
-app.get('/getLineData', api.getLineData)
-app.get('/getPieData', api.getPieData)
+app.use('/',    require('./routers/index'))
+app.use('/api', require('./routers/api'))
 
-http.createServer(app).listen(app.get('port'), function(){
-  console.log("Express server listening on port " + app.get('port'))
-})
+app.listen(app.get('port'))
