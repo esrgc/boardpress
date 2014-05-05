@@ -9,9 +9,9 @@ var LineChartView = BarChartView.extend({
     this.chart = new GeoDash.LineChart(chartel, {
       x: this.model.get('key')
       , y: []
-      , colors: ['#D1E751', '#26ADE4']
+      , colors: Dashboard.colors
       , legend: true
-      , legendWidth: 50
+      , legendWidth: 90
       , hoverTemplate: "{{x}}: {{y}}"
       , interpolate: 'none'
       , xTickFormat: d3.time.format('%m/%d')

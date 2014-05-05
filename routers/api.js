@@ -10,17 +10,20 @@ api.get('/getBarData', function(req, res){
     {
       "Name": "Grant 5307",
       "On": 828,
-      "Off": 1079
+      "Off": 1079,
+      "Rest": 300
     },
     {
       "Name": "Grant 5311",
-      "On": 289,
-      "Off": 395
+      "On": 689,
+      "Off": 795,
+      "Rest": 200
     },
     {
       "Name": "Grant DHR",
-      "On": 1806,
-      "Off": 3205
+      "On": 1206,
+      "Off": 1805,
+      "Rest": 600
     }
   ]
   returnData(req, res, data)
@@ -35,7 +38,7 @@ api.get('/getBarData2', function(req, res){
       '2013': 42235.7
     },
     {
-      'id': 'Tuesday Lol',
+      'id': 'Tue',
       '2011': 165113.8,
       '2012': 42235.7,
       '2013': 42235.7
@@ -105,18 +108,39 @@ api.get('/getLineData', function(req, res){
   var data = [
     {
       'date': '2013-06-01',
-      'numCats':92817,
-      'goalCats': 100000
+      'numCats':22817,
+      'goalCats': 80000,
+      'numFluffyCats': 10000
     },
     {
       'date': '2013-06-02',
-      'numCats':82705,
-      'goalCats': 100000
+      'numCats':24817,
+      'goalCats': 80000,
+      'numFluffyCats': 11000
     },
     {
       'date': '2013-06-03',
-      'numCats':75920,
-      'goalCats': 100000
+      'numCats':35817,
+      'goalCats': 80000,
+      'numFluffyCats': 16000
+    },
+    {
+      'date': '2013-06-04',
+      'numCats':48817,
+      'goalCats': 80000,
+      'numFluffyCats': 18000
+    },
+    {
+      'date': '2013-06-05',
+      'numCats':68705,
+      'goalCats': 80000,
+      'numFluffyCats': 22000
+    },
+    {
+      'date': '2013-06-06',
+      'numCats':92920,
+      'goalCats': 80000,
+      'numFluffyCats': 28000
     }
   ]
   returnData(req, res, data)
@@ -130,6 +154,10 @@ api.get('/getPieData', function(req, res){
     },
     {
       'id':'cats',
+      'value':28
+    },
+    {
+      'id':'cool',
       'value':11
     }
   ]

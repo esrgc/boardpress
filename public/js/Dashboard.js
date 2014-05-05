@@ -12,6 +12,7 @@ var MapView = require('./MapView')
   , ChartCollection = require('./ChartCollection')
 
 var Dashboard = Backbone.View.extend({
+  colors: ['#94BA65', '#2790B0', '#2B4E72'],
   initialize: function(){
     this.filterCollection = new FilterCollection()
     this.filterCollection.on('change', this.update, this)

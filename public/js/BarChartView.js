@@ -25,7 +25,7 @@ var BarChartView = ChartView.extend({
     this.chart = new GeoDash.BarChartVertical(chartel, {
       x: this.model.get('key')
       , y: []
-      , colors: ['#D1E751', '#26ADE4', "#333"]
+      , colors: Dashboard.colors
       , title: 'Vertical Bar Chart'
       , yTickFormat: d3.format(".2s")
       , opacity: 1

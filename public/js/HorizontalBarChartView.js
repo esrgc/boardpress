@@ -8,7 +8,7 @@ var HorizontalBarChartView = BarChartView.extend({
     this.chart = new GeoDash.BarChartHorizontal(chartel, {
       y: this.model.get('key')
       , x: []
-      , colors: ['#D1E751', '#26ADE4']
+      , colors: Dashboard.colors
       , xTickFormat: d3.format(".2s")
       , yWidth: 60
       , opacity: 1

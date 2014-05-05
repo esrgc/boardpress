@@ -9,7 +9,7 @@ var PieChartView = BarChartView.extend({
     this.chart = new GeoDash.PieChart(chartel, {
       label: this.model.get('key')
       , value: 'value'
-      , colors: ['#D1E751', '#26ADE4', "#333"]
+      , colors: Dashboard.colors
       , opacity: 1
     })
   },
