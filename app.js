@@ -31,4 +31,4 @@ if ('development' == env) {
 app.use('/',    require('./routers/index'))
 app.use('/api', require('./routers/api'))
 
-app.listen(app.get('port'))
+module.exports = app
