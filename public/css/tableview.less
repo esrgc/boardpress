@@ -6,8 +6,9 @@
       background: #fff;
       margin-bottom: 0px;
       color: #333;
+      border: none;
       thead tr th {
-        border-bottom: 0px solid @tableBorder;
+        border-top: none;
       }
 
       td, th {
@@ -15,7 +16,10 @@
         border-right: 1px solid @tableBorder;
         border-bottom: 1px solid @tableBorder;
         &:first-child {
-          border-left: 0px solid @tableBorder;
+          border-left: none;
+        }
+        &:last-child {
+          border-right: none;
         }
       }
 

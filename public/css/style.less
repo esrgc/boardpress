@@ -28,9 +28,9 @@ body {
 }
 
 .chart {
-  background: @main;
+  background: @alternate;
   margin-bottom: 20px;
-  border: 1px solid @main;
+  border: 1px solid darken(@alternate, 20%);
   border-radius: 2px;
   padding: 5px;
   overflow: hidden;
@@ -50,7 +50,7 @@ body {
     background: #fff;
     overflow-y: auto;
     clear: both;
-    border: @main;
+    border: 1px solid @tableBorder;
   }
 }
 
