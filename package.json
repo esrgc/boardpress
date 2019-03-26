@@ -1,6 +1,6 @@
 {
   "name": "boardpress",
-  "version": "0.1.118",
+  "version": "0.1.121",
   "description": "boardpress ============",
   "main": "server.js",
   "scripts": {
@@ -14,18 +14,17 @@
   "author": "",
   "readmeFilename": "README.md",
   "dependencies": {
-    "express": "4.0.x",
-    "errorhandler": "1.0.0",
+    "backbone": "1.1.2",
     "body-parser": "1.0.1",
-    "morgan": "1.0.0",
-    "ejs": "~0.8.5",
-    "tedious": "~0.1.5",
-    "mustache": "~0.8.1",
     "cors": "^2.2.0",
     "csv": "0.3.7",
-    "underscore": "1.6.0",
-    "mustache": "0.8.1",
-    "backbone": "1.1.2"
+    "ejs": "^2.5.5",
+    "errorhandler": "1.0.0",
+    "express": "^4.5.0",
+    "morgan": "^1.9.1",
+    "mustache": "^2.2.1",
+    "tedious": "~0.1.5",
+    "underscore": "1.6.0"
   },
   "devDependencies": {
     "grunt": "~0.4.2",
